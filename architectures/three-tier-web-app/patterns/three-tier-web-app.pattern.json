@@ -221,22 +221,78 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
-                    "properties": {
-                        "unique-id": { "const": "vpc" },
-                        "name": { "const": "Virtual Private Cloud" },
-                        "description": { "const": "The virtual private cloud providing an isolated network environment." },
-                        "node-type": { "const": "network" }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "google-vpc" },
+                                "name": { "const": "Google Virtual Private Cloud (VPC)" },
+                                "description": { "const": "The virtual private cloud providing an isolated network environment." },
+                                "node-type": { "const": "network" },
+                                "ccc-service": { "const": "Virtual Network" },
+                                "csp-service": { "const": "Virtual Private Cloud (VPC)" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "aws-vpc" },
+                                "name": { "const": "Amazon Virtual Private Cloud (VPC)" },
+                                "description": { "const": "The virtual private cloud providing an isolated network environment." },
+                                "node-type": { "const": "network" },
+                                "ccc-service": { "const": "Virtual Network" },
+                                "csp-service": { "const": "Amazon Virtual Private Cloud (VPC)" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "azure-vnet" },
+                                "name": { "const": "Azure Virtual Network (VNet)" },
+                                "description": { "const": "The virtual private cloud providing an isolated network environment." },
+                                "node-type": { "const": "network" },
+                                "ccc-service": { "const": "Virtual Network" },
+                                "csp-service": { "const": "Azure Virtual Network (VNet)" }
+                            }
+                        }
+                    ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
-                    "properties": {
-                        "unique-id": { "const": "subnet" },
-                        "name": { "const": "Subnet" },
-                        "description": { "const": "The subnet for application components." },
-                        "node-type": { "const": "network" }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "google-subnet" },
+                                "name": { "const": "Google Subnet" },
+                                "description": { "const": "The subnet for application components." },
+                                "node-type": { "const": "network" },
+                                "ccc-service": { "const": "Subnet" },
+                                "csp-service": { "const": "VPC Subnets" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "aws-subnet" },
+                                "name": { "const": "AWS Subnet" },
+                                "description": { "const": "The subnet for application components." },
+                                "node-type": { "const": "network" },
+                                "ccc-service": { "const": "Subnet" },
+                                "csp-service": { "const": "Amazon VPC Subnets" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "azure-subnet" },
+                                "name": { "const": "Azure Subnet" },
+                                "description": { "const": "The subnet for application components." },
+                                "node-type": { "const": "network" },
+                                "ccc-service": { "const": "Subnet" },
+                                "csp-service": { "const": "Azure Virtual Network Subnets" }
+                            }
+                        }
+                    ]
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
@@ -418,7 +474,7 @@
                                 "relationship-type": {
                                     "const": {
                                         "deployed-in": {
-                                            "container": "subnet",
+                                            "container": "google-subnet",
                                             "nodes": ["webtier", "app-tier", "db-tier", "google-internal-lb", "google-external-lb"]
                                         }
                                     }
@@ -432,7 +488,7 @@
                                 "relationship-type": {
                                     "const": {
                                         "deployed-in": {
-                                            "container": "subnet",
+                                            "container": "aws-subnet",
                                             "nodes": ["webtier", "app-tier", "db-tier", "aws-internal-lb", "aws-external-lb"]
                                         }
                                     }
@@ -446,7 +502,7 @@
                                 "relationship-type": {
                                     "const": {
                                         "deployed-in": {
-                                            "container": "subnet",
+                                            "container": "azure-subnet",
                                             "nodes": ["webtier", "app-tier", "db-tier", "azure-internal-lb", "azure-external-lb"]
                                         }
                                     }
@@ -456,11 +512,29 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
-                    "properties": {
-                        "unique-id": { "const": "subnet-in-vpc" },
-                        "relationship-type": { "const": { "composed-of": { "container": "vpc", "nodes": ["subnet"] } } }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "subnet-in-vpc-google" },
+                                "relationship-type": { "const": { "composed-of": { "container": "google-vpc", "nodes": ["google-subnet"] } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "subnet-in-vpc-aws" },
+                                "relationship-type": { "const": { "composed-of": { "container": "aws-vpc", "nodes": ["aws-subnet"] } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "subnet-in-vpc-azure" },
+                                "relationship-type": { "const": { "composed-of": { "container": "azure-vnet", "nodes": ["azure-subnet"] } } }
+                            }
+                        }
+                    ]
                 },
                 {
                     "oneOf": [
@@ -508,10 +582,10 @@
                                                     "properties": {
                                                         "description": { "const": "Google Cloud" },
                                                         "nodes": {
-                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql", "google-external-lb", "google-internal-lb"]
+                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql", "google-external-lb", "google-internal-lb", "google-vpc", "google-subnet"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms", "db-tier-composed-of-google-sql", "external-lb-to-webtier-google", "user-connects-to-lb-google", "components-in-subnet-google", "webtier-to-internal-lb-google", "internal-lb-to-app-tier-google", "app-tier-to-db-tier"]
+                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms", "db-tier-composed-of-google-sql", "external-lb-to-webtier-google", "user-connects-to-lb-google", "components-in-subnet-google", "webtier-to-internal-lb-google", "internal-lb-to-app-tier-google", "app-tier-to-db-tier", "subnet-in-vpc-google"]
                                                         }
                                                     }
                                                 },
@@ -521,10 +595,10 @@
                                                     "properties": {
                                                         "description": { "const": "Amazon Web Services (AWS)" },
                                                         "nodes": {
-                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds", "aws-external-lb", "aws-internal-lb"]
+                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds", "aws-external-lb", "aws-internal-lb", "aws-vpc", "aws-subnet"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms", "db-tier-composed-of-aws-rds", "external-lb-to-webtier-aws", "user-connects-to-lb-aws", "components-in-subnet-aws", "webtier-to-internal-lb-aws", "internal-lb-to-app-tier-aws", "app-tier-to-db-tier"]
+                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms", "db-tier-composed-of-aws-rds", "external-lb-to-webtier-aws", "user-connects-to-lb-aws", "components-in-subnet-aws", "webtier-to-internal-lb-aws", "internal-lb-to-app-tier-aws", "app-tier-to-db-tier", "subnet-in-vpc-aws"]
                                                         }
                                                     }
                                                 },
@@ -533,10 +607,10 @@
                                                     "properties": {
                                                         "description": { "const": "Microsoft Azure" },
                                                         "nodes": {
-                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database", "azure-external-lb", "azure-internal-lb"]
+                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database", "azure-external-lb", "azure-internal-lb", "azure-vnet", "azure-subnet"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms", "db-tier-composed-of-azure-db", "external-lb-to-webtier-azure", "user-connects-to-lb-azure", "components-in-subnet-azure", "webtier-to-internal-lb-azure", "internal-lb-to-app-tier-azure", "app-tier-to-db-tier"]
+                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms", "db-tier-composed-of-azure-db", "external-lb-to-webtier-azure", "user-connects-to-lb-azure", "components-in-subnet-azure", "webtier-to-internal-lb-azure", "internal-lb-to-app-tier-azure", "app-tier-to-db-tier", "subnet-in-vpc-azure"]
                                                         }
                                                     }
                                                 }
