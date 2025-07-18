@@ -9,7 +9,7 @@
             "type": "array",
             "prefixItems": [
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                     "properties": {
                         "unique-id": { "const": "webtier" },
                         "name": { "const": "Web Tier" },
@@ -18,7 +18,7 @@
                     }
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                     "properties": {
                         "unique-id": { "const": "app-tier" },
                         "name": { "const": "Application Tier" },
@@ -27,7 +27,7 @@
                     }
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                     "properties": {
                         "unique-id": { "const": "db-tier" },
                         "name": { "const": "Database Tier" },
@@ -38,7 +38,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "webtier-google-compute-engine-vms" },
                                 "name": { "const": "Google Cloud VMs" },
@@ -49,7 +49,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "webtier-ec2-vms" },
                                 "name": { "const": "Amazon EC2 VMs" },
@@ -60,7 +60,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "webtier-azure-vms" },
                                 "name": { "const": "Azure VMs" },
@@ -75,7 +75,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-app-server-vms" },
                                 "name": { "const": "Google Cloud App Server VMs" },
@@ -86,7 +86,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-app-server-vms" },
                                 "name": { "const": "Amazon EC2 App Server VMs" },
@@ -97,7 +97,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-app-server-vms" },
                                 "name": { "const": "Azure App Server VMs" },
@@ -112,7 +112,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-cloud-sql" },
                                 "name": { "const": "Google Cloud SQL" },
@@ -123,7 +123,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-rds" },
                                 "name": { "const": "Amazon RDS" },
@@ -134,7 +134,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-database" },
                                 "name": { "const": "Azure Database" },
@@ -149,7 +149,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-external-lb" },
                                 "name": { "const": "Google External Load Balancer" },
@@ -160,7 +160,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-external-lb" },
                                 "name": { "const": "AWS External Load Balancer" },
@@ -171,7 +171,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-external-lb" },
                                 "name": { "const": "Azure External Load Balancer" },
@@ -186,7 +186,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-internal-lb" },
                                 "name": { "const": "Google Internal Load Balancer" },
@@ -197,7 +197,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-internal-lb" },
                                 "name": { "const": "AWS Internal Load Balancer" },
@@ -208,7 +208,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-internal-lb" },
                                 "name": { "const": "Azure Internal Load Balancer" },
@@ -223,7 +223,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-vpc" },
                                 "name": { "const": "Google Virtual Private Cloud (VPC)" },
@@ -234,7 +234,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-vpc" },
                                 "name": { "const": "Amazon Virtual Private Cloud (VPC)" },
@@ -245,7 +245,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-vnet" },
                                 "name": { "const": "Azure Virtual Network (VNet)" },
@@ -260,7 +260,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-subnet" },
                                 "name": { "const": "Google Subnet" },
@@ -271,7 +271,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-subnet" },
                                 "name": { "const": "AWS Subnet" },
@@ -282,7 +282,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-subnet" },
                                 "name": { "const": "Azure Subnet" },
@@ -295,7 +295,7 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                     "properties": {
                         "unique-id": { "const": "application-user" },
                         "name": { "const": "Application User" },
@@ -306,7 +306,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-cloud-provider" },
                                 "name": { "const": "Google Cloud" },
@@ -315,7 +315,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-provider" },
                                 "name": { "const": "Amazon Web Services (AWS)" },
@@ -324,7 +324,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-provider" },
                                 "name": { "const": "Microsoft Azure" },
@@ -337,7 +337,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-cloud-storage" },
                                 "name": { "const": "Google Cloud Storage" },
@@ -348,7 +348,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "aws-s3" },
                                 "name": { "const": "Amazon S3" },
@@ -359,7 +359,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "azure-blob-storage" },
                                 "name": { "const": "Azure Blob Storage" },
@@ -379,21 +379,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-composed-of-google-vms" },
                                 "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-google-compute-engine-vms"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-composed-of-amazon-vms" },
                                 "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-ec2-vms"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-composed-of-azure-vms" },
                                 "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-azure-vms"] } } }
@@ -404,21 +404,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "app-tier-composed-of-google-vms" },
                                 "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["google-app-server-vms"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "app-tier-composed-of-aws-vms" },
                                 "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["aws-app-server-vms"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "app-tier-composed-of-azure-vms" },
                                 "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["azure-app-server-vms"] } } }
@@ -429,21 +429,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-composed-of-google-sql" },
                                 "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["google-cloud-sql"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-composed-of-aws-rds" },
                                 "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["aws-rds"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-composed-of-azure-db" },
                                 "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["azure-database"] } } }
@@ -454,21 +454,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "external-lb-to-webtier-google" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "google-external-lb" }, "destination": { "node": "webtier" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "external-lb-to-webtier-aws" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "aws-external-lb" }, "destination": { "node": "webtier" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "external-lb-to-webtier-azure" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "azure-external-lb" }, "destination": { "node": "webtier" } } } }
@@ -479,21 +479,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-to-internal-lb-google" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "google-internal-lb" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-to-internal-lb-aws" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "aws-internal-lb" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-to-internal-lb-azure" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "azure-internal-lb" } } } }
@@ -504,21 +504,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "internal-lb-to-app-tier-google" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "google-internal-lb" }, "destination": { "node": "app-tier" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "internal-lb-to-app-tier-aws" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "aws-internal-lb" }, "destination": { "node": "app-tier" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "internal-lb-to-app-tier-azure" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "azure-internal-lb" }, "destination": { "node": "app-tier" } } } }
@@ -527,7 +527,7 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                     "properties": {
                         "unique-id": { "const": "app-tier-to-db-tier" },
                         "relationship-type": { "const": { "connects": { "source": { "node": "app-tier" }, "destination": { "node": "db-tier" } } } }
@@ -536,21 +536,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-to-object-store-google" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "google-cloud-sql" }, "destination": { "node": "google-cloud-storage" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-to-object-store-aws" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "aws-rds" }, "destination": { "node": "aws-s3" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-to-object-store-azure" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "azure-database" }, "destination": { "node": "azure-blob-storage" } } } }
@@ -561,7 +561,7 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "components-in-subnet-google" },
                                 "relationship-type": {
@@ -575,7 +575,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "components-in-subnet-aws" },
                                 "relationship-type": {
@@ -589,7 +589,7 @@
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "components-in-subnet-azure" },
                                 "relationship-type": {
@@ -607,21 +607,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "subnet-in-vpc-google" },
                                 "relationship-type": { "const": { "composed-of": { "container": "google-vpc", "nodes": ["google-subnet"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "subnet-in-vpc-aws" },
                                 "relationship-type": { "const": { "composed-of": { "container": "aws-vpc", "nodes": ["aws-subnet"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "subnet-in-vpc-azure" },
                                 "relationship-type": { "const": { "composed-of": { "container": "azure-vnet", "nodes": ["azure-subnet"] } } }
@@ -632,21 +632,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "user-connects-to-lb-google" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "application-user" }, "destination": { "node": "google-external-lb" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "user-connects-to-lb-aws" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "application-user" }, "destination": { "node": "aws-external-lb" } } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "user-connects-to-lb-azure" },
                                 "relationship-type": { "const": { "connects": { "source": { "node": "application-user" }, "destination": { "node": "azure-external-lb" } } } }
@@ -655,7 +655,7 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                     "properties": {
                         "unique-id": { "const": "csp-selection" },
                         "description": { "const": "Select the Cloud Service Provider for the architecture." },
@@ -670,7 +670,7 @@
                                         {
                                             "oneOf": [
                                                 {
-                                                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/decision",
+                                                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/decision",
                                                     "type": "object",
                                                     "properties": {
                                                         "description": { "const": "Google Cloud" },
@@ -683,7 +683,7 @@
                                                     }
                                                 },
                                                 {
-                                                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/decision",
+                                                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/decision",
                                                     "type": "object",
                                                     "properties": {
                                                         "description": { "const": "Amazon Web Services (AWS)" },
@@ -696,7 +696,7 @@
                                                     }
                                                 },
                                                 {
-                                                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/decision",
+                                                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/decision",
                                                     "properties": {
                                                         "description": { "const": "Microsoft Azure" },
                                                         "nodes": {
@@ -718,21 +718,21 @@
                 {
                     "oneOf": [
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "vpc-in-google-provider" },
                                 "relationship-type": { "const": { "composed-of": { "container": "google-cloud-provider", "nodes": ["google-vpc", "google-cloud-storage"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "vpc-in-aws-provider" },
                                 "relationship-type": { "const": { "composed-of": { "container": "aws-provider", "nodes": ["aws-vpc", "aws-s3"] } } }
                             }
                         },
                         {
-                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "vnet-in-azure-provider" },
                                 "relationship-type": { "const": { "composed-of": { "container": "azure-provider", "nodes": ["azure-vnet", "azure-blob-storage"] } } }
