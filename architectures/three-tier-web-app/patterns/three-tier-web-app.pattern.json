@@ -1,5 +1,5 @@
 {
-    "$schema": "https://calm.finos.org/release/1.0-rc1/meta/calm.json",
+    "$schema": "https://calm.finos.org/release/1.0-rc2/meta/calm.json",
     "$id": "https://raw.githubusercontent.com/finos/architecture-as-code/main/common-cloud-controls/architectures/three-tier-web-app/patterns/three-tier-web-app.pattern.json",
     "title": "Three-Tier Web Application Pattern",
     "description": "A CALM pattern for a generic three-tier web application, adaptable to multiple cloud providers.",
@@ -11,10 +11,21 @@
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
                     "properties": {
-                        "unique-id": { "const": "web-tier" },
+                        "unique-id": { "const": "webtier" },
                         "name": { "const": "Web Tier" },
                         "description": { "const": "The logical web tier, containing web server VMs." },
-                        "node-type": { "const": "compute" }
+                        "node-type": { "const": "compute" },
+                        "metadata": {
+                            "type": "array",
+                            "prefixItems": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "ccc-service": { "const": "Virtual Machines (VMs)" }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 },
                 {
@@ -23,7 +34,18 @@
                         "unique-id": { "const": "app-tier" },
                         "name": { "const": "Application Tier" },
                         "description": { "const": "The logical application tier, containing application server VMs." },
-                        "node-type": { "const": "compute" }
+                        "node-type": { "const": "compute" },
+                        "metadata": {
+                            "type": "array",
+                            "prefixItems": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "ccc-service": { "const": "Virtual Machines (VMs)" }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 },
                 {
@@ -32,7 +54,18 @@
                         "unique-id": { "const": "db-tier" },
                         "name": { "const": "Database Tier" },
                         "description": { "const": "The logical database tier, containing the database instance." },
-                        "node-type": { "const": "database" }
+                        "node-type": { "const": "database" },
+                        "metadata": {
+                            "type": "array",
+                            "prefixItems": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "ccc-service": { "const": "Relational Database Management Systems" }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 },
                 {
@@ -68,7 +101,18 @@
                         "unique-id": { "const": "external-lb" },
                         "name": { "const": "External Load Balancer" },
                         "description": { "const": "The external load balancer, distributing traffic to the web tier." },
-                        "node-type": { "const": "load-balancer" }
+                        "node-type": { "const": "load-balancer" },
+                        "metadata": {
+                            "type": "array",
+                            "prefixItems": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "ccc-service": { "const": "Load Balancing" }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 },
                 {
@@ -77,7 +121,18 @@
                         "unique-id": { "const": "internal-lb" },
                         "name": { "const": "Internal Load Balancer" },
                         "description": { "const": "The internal load balancer, distributing traffic from the web tier to the app tier." },
-                        "node-type": { "const": "load-balancer" }
+                        "node-type": { "const": "load-balancer" },
+                        "metadata": {
+                            "type": "array",
+                            "prefixItems": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "ccc-service": { "const": "Load Balancing" }
+                                    }
+                                }
+                            ]
+                        }
                     }
                 },
                 {
@@ -86,16 +141,36 @@
                         "unique-id": { "const": "vpc" },
                         "name": { "const": "Virtual Private Cloud" },
                         "description": { "const": "The virtual private cloud providing an isolated network environment." },
+                        "node-type": { "const": "network" },
+                        "metadata": {
+                            "type": "array",
+                            "prefixItems": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "ccc-service": { "const": "Virtual Private Cloud (VPC)" }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                    "properties": {
+                        "unique-id": { "const": "subnet" },
+                        "name": { "const": "Subnet" },
+                        "description": { "const": "The subnet for application components." },
                         "node-type": { "const": "network" }
                     }
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
                     "properties": {
-                        "unique-id": { "const": "object-storage" },
-                        "name": { "const": "Object Storage" },
-                        "description": { "const": "Object storage for storing application assets." },
-                        "node-type": { "const": "storage" }
+                        "unique-id": { "const": "application-user" },
+                        "name": { "const": "Application User" },
+                        "description": { "const": "A user of the application." },
+                        "node-type": { "const": "actor" }
                     }
                 }
             ]
@@ -106,8 +181,8 @@
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                     "properties": {
-                        "unique-id": { "const": "web-tier-composed-of-vms" },
-                        "relationship-type": { "const": { "composed-of": { "container": "web-tier", "nodes": ["web-server-vms"] } } }
+                        "unique-id": { "const": "webtier-composed-of-vms" },
+                        "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["web-server-vms"] } } }
                     }
                 },
                 {
@@ -127,14 +202,14 @@
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                     "properties": {
-                        "unique-id": { "const": "external-lb-to-web-tier" },
-                        "relationship-type": { "const": { "connects": { "source": { "node": "external-lb" }, "destination": { "node": "web-tier" } } } }
+                        "unique-id": { "const": "external-lb-to-webtier" },
+                        "relationship-type": { "const": { "connects": { "source": { "node": "external-lb" }, "destination": { "node": "webtier" } } } }
                     }
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                     "properties": {
-                        "unique-id": { "const": "web-tier-to-internal-lb" },
+                        "unique-id": { "const": "webtier-to-internal-lb" },
                         "relationship-type": { "const": { "connects": { "source": { "node": "web-server-vms" }, "destination": { "node": "internal-lb" } } } }
                     }
                 },
@@ -155,15 +230,29 @@
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                     "properties": {
-                        "unique-id": { "const": "components-in-vpc" },
+                        "unique-id": { "const": "components-in-subnet" },
                         "relationship-type": {
                             "const": {
                                 "deployed-in": {
-                                    "container": "vpc",
-                                    "nodes": ["web-tier", "app-tier", "db-tier", "internal-lb", "external-lb"]
+                                    "container": "subnet",
+                                    "nodes": ["webtier", "app-tier", "db-tier", "internal-lb", "external-lb"]
                                 }
                             }
                         }
+                    }
+                },
+                {
+                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                    "properties": {
+                        "unique-id": { "const": "subnet-in-vpc" },
+                        "relationship-type": { "const": { "composed-of": { "container": "vpc", "nodes": ["subnet"] } } }
+                    }
+                },
+                {
+                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                    "properties": {
+                        "unique-id": { "const": "user-connects-to-lb" },
+                        "relationship-type": { "const": { "connects": { "source": { "node": "application-user" }, "destination": { "node": "external-lb" } } } }
                     }
                 }
             ]
