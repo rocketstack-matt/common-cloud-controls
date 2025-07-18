@@ -40,7 +40,7 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
                             "properties": {
-                                "unique-id": { "const": "google-compute-engine-vms" },
+                                "unique-id": { "const": "webtier-google-compute-engine-vms" },
                                 "name": { "const": "Google Cloud VMs" },
                                 "description": { "const": "The virtual machines in the web tier delivered by Google Cloud." },
                                 "node-type": { "const": "compute" },
@@ -51,7 +51,7 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
                             "properties": {
-                                "unique-id": { "const": "ec2-vms" },
+                                "unique-id": { "const": "webtier-ec2-vms" },
                                 "name": { "const": "Amazon EC2 VMs" },
                                 "description": { "const": "The virtual machines in the web tier delivered by Amazon EC2." },
                                 "node-type": { "const": "compute" },
@@ -62,7 +62,7 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
                             "properties": {
-                                "unique-id": { "const": "azure-vms" },
+                                "unique-id": { "const": "webtier-azure-vms" },
                                 "name": { "const": "Azure VMs" },
                                 "description": { "const": "The virtual machines in the web tier delivered by Azure." },
                                 "node-type": { "const": "compute" },
@@ -110,13 +110,41 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
-                    "properties": {
-                        "unique-id": { "const": "database-instance" },
-                        "name": { "const": "Database Instance" },
-                        "description": { "const": "The database instance for data persistence." },
-                        "node-type": { "const": "database" }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "google-cloud-sql" },
+                                "name": { "const": "Google Cloud SQL" },
+                                "description": { "const": "The database instance delivered by Google Cloud." },
+                                "node-type": { "const": "database" },
+                                "ccc-service": { "const": "Relational Database Management Systems" },
+                                "csp-service": { "const": "Cloud SQL for PostgreSQL / MySQL" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "aws-rds" },
+                                "name": { "const": "Amazon RDS" },
+                                "description": { "const": "The database instance delivered by Amazon RDS." },
+                                "node-type": { "const": "database" },
+                                "ccc-service": { "const": "Relational Database Management Systems" },
+                                "csp-service": { "const": "Amazon RDS for PostgreSQL / MySQL" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "azure-database" },
+                                "name": { "const": "Azure Database" },
+                                "description": { "const": "The database instance delivered by Azure." },
+                                "node-type": { "const": "database" },
+                                "ccc-service": { "const": "Relational Database Management Systems" },
+                                "csp-service": { "const": "Azure Database for PostgreSQL / MySQL Flexible Server" }
+                            }
+                        }
+                    ]
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
@@ -185,21 +213,21 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-composed-of-google-vms" },
-                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["google-compute-engine-vms"] } } }
+                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-google-compute-engine-vms"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-composed-of-amazon-vms" },
-                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["ec2-vms"] } } }
+                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-ec2-vms"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-composed-of-azure-vms" },
-                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["azure-vms"] } } }
+                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-azure-vms"] } } }
                             }
                         }
                     ]
@@ -230,11 +258,29 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
-                    "properties": {
-                        "unique-id": { "const": "db-tier-composed-of-instance" },
-                        "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["database-instance"] } } }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "db-tier-composed-of-google-sql" },
+                                "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["google-cloud-sql"] } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "db-tier-composed-of-aws-rds" },
+                                "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["aws-rds"] } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "db-tier-composed-of-azure-db" },
+                                "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["azure-database"] } } }
+                            }
+                        }
+                    ]
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
@@ -313,10 +359,10 @@
                                                     "properties": {
                                                         "description": { "const": "Google Cloud" },
                                                         "nodes": {
-                                                            "const": ["google-compute-engine-vms", "google-app-server-vms"]
+                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms"]
+                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms", "db-tier-composed-of-google-sql"]
                                                         }
                                                     }
                                                 },
@@ -326,10 +372,10 @@
                                                     "properties": {
                                                         "description": { "const": "Amazon Web Services (AWS)" },
                                                         "nodes": {
-                                                            "const": ["ec2-vms", "aws-app-server-vms"]
+                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms"]
+                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms", "db-tier-composed-of-aws-rds"]
                                                         }
                                                     }
                                                 },
@@ -338,10 +384,10 @@
                                                     "properties": {
                                                         "description": { "const": "Microsoft Azure" },
                                                         "nodes": {
-                                                            "const": ["azure-vms", "azure-app-server-vms"]
+                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms"]
+                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms", "db-tier-composed-of-azure-db"]
                                                         }
                                                     }
                                                 }
