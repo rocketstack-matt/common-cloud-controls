@@ -73,13 +73,41 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
-                    "properties": {
-                        "unique-id": { "const": "app-server-vms" },
-                        "name": { "const": "Application Server VMs" },
-                        "description": { "const": "The virtual machines in the application tier." },
-                        "node-type": { "const": "compute" }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "google-app-server-vms" },
+                                "name": { "const": "Google Cloud App Server VMs" },
+                                "description": { "const": "The virtual machines in the application tier delivered by Google Cloud." },
+                                "node-type": { "const": "compute" },
+                                "ccc-service": { "const": "Virtual Machines (VMs)" },
+                                "csp-service": { "const": "Compute Engine Managed Instance Group" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "aws-app-server-vms" },
+                                "name": { "const": "Amazon EC2 App Server VMs" },
+                                "description": { "const": "The virtual machines in the application tier delivered by Amazon EC2." },
+                                "node-type": { "const": "compute" },
+                                "ccc-service": { "const": "Virtual Machines (VMs)" },
+                                "csp-service": { "const": "Amazon EC2 Auto Scaling with Launch Templates" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "azure-app-server-vms" },
+                                "name": { "const": "Azure App Server VMs" },
+                                "description": { "const": "The virtual machines in the application tier delivered by Azure." },
+                                "node-type": { "const": "compute" },
+                                "ccc-service": { "const": "Virtual Machines (VMs)" },
+                                "csp-service": { "const": "Azure Virtual Machine Scale Sets" }
+                            }
+                        }
+                    ]
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
@@ -177,11 +205,29 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
-                    "properties": {
-                        "unique-id": { "const": "app-tier-composed-of-vms" },
-                        "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["app-server-vms"] } } }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "app-tier-composed-of-google-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["google-app-server-vms"] } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "app-tier-composed-of-aws-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["aws-app-server-vms"] } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "app-tier-composed-of-azure-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["azure-app-server-vms"] } } }
+                            }
+                        }
+                    ]
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
@@ -201,7 +247,7 @@
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                     "properties": {
                         "unique-id": { "const": "webtier-to-internal-lb" },
-                        "relationship-type": { "const": { "connects": { "source": { "node": "web-server-vms" }, "destination": { "node": "internal-lb" } } } }
+                        "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "internal-lb" } } } }
                     }
                 },
                 {
@@ -267,10 +313,10 @@
                                                     "properties": {
                                                         "description": { "const": "Google Cloud" },
                                                         "nodes": {
-                                                            "const": ["google-compute-engine-vms"]
+                                                            "const": ["google-compute-engine-vms", "google-app-server-vms"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-google-vms"]
+                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms"]
                                                         }
                                                     }
                                                 },
@@ -280,10 +326,10 @@
                                                     "properties": {
                                                         "description": { "const": "Amazon Web Services (AWS)" },
                                                         "nodes": {
-                                                            "const": ["ec2-vms"]
+                                                            "const": ["ec2-vms", "aws-app-server-vms"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-amazon-vms"]
+                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms"]
                                                         }
                                                     }
                                                 },
@@ -292,10 +338,10 @@
                                                     "properties": {
                                                         "description": { "const": "Microsoft Azure" },
                                                         "nodes": {
-                                                            "const": ["azure-vms"]
+                                                            "const": ["azure-vms", "azure-app-server-vms"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-azure-vms"]
+                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms"]
                                                         }
                                                     }
                                                 }
