@@ -184,13 +184,41 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
-                    "properties": {
-                        "unique-id": { "const": "internal-lb" },
-                        "name": { "const": "Internal Load Balancer" },
-                        "description": { "const": "The internal load balancer, distributing traffic from the web tier to the app tier." },
-                        "node-type": { "const": "load-balancer" }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "google-internal-lb" },
+                                "name": { "const": "Google Internal Load Balancer" },
+                                "description": { "const": "The internal load balancer, distributing traffic from the web tier to the app tier." },
+                                "node-type": { "const": "load-balancer" },
+                                "ccc-service": { "const": "Load Balancing" },
+                                "csp-service": { "const": "Internal HTTP(S) Load Balancer" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "aws-internal-lb" },
+                                "name": { "const": "AWS Internal Load Balancer" },
+                                "description": { "const": "The internal load balancer, distributing traffic from the web tier to the app tier." },
+                                "node-type": { "const": "load-balancer" },
+                                "ccc-service": { "const": "Load Balancing" },
+                                "csp-service": { "const": "Elastic Load Balancing – Network Load Balancer (NLB)" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "azure-internal-lb" },
+                                "name": { "const": "Azure Internal Load Balancer" },
+                                "description": { "const": "The internal load balancer, distributing traffic from the web tier to the app tier." },
+                                "node-type": { "const": "load-balancer" },
+                                "ccc-service": { "const": "Load Balancing" },
+                                "csp-service": { "const": "Azure Load Balancer" }
+                            }
+                        }
+                    ]
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
@@ -325,18 +353,54 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
-                    "properties": {
-                        "unique-id": { "const": "webtier-to-internal-lb" },
-                        "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "internal-lb" } } } }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "webtier-to-internal-lb-google" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "google-internal-lb" } } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "webtier-to-internal-lb-aws" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "aws-internal-lb" } } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "webtier-to-internal-lb-azure" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "azure-internal-lb" } } } }
+                            }
+                        }
+                    ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
-                    "properties": {
-                        "unique-id": { "const": "internal-lb-to-app-tier" },
-                        "relationship-type": { "const": { "connects": { "source": { "node": "internal-lb" }, "destination": { "node": "app-tier" } } } }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "internal-lb-to-app-tier-google" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "google-internal-lb" }, "destination": { "node": "app-tier" } } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "internal-lb-to-app-tier-aws" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-internal-lb" }, "destination": { "node": "app-tier" } } } }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "internal-lb-to-app-tier-azure" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-internal-lb" }, "destination": { "node": "app-tier" } } } }
+                            }
+                        }
+                    ]
                 },
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
@@ -355,7 +419,7 @@
                                     "const": {
                                         "deployed-in": {
                                             "container": "subnet",
-                                            "nodes": ["webtier", "app-tier", "db-tier", "internal-lb", "google-external-lb"]
+                                            "nodes": ["webtier", "app-tier", "db-tier", "google-internal-lb", "google-external-lb"]
                                         }
                                     }
                                 }
@@ -369,7 +433,7 @@
                                     "const": {
                                         "deployed-in": {
                                             "container": "subnet",
-                                            "nodes": ["webtier", "app-tier", "db-tier", "internal-lb", "aws-external-lb"]
+                                            "nodes": ["webtier", "app-tier", "db-tier", "aws-internal-lb", "aws-external-lb"]
                                         }
                                     }
                                 }
@@ -383,7 +447,7 @@
                                     "const": {
                                         "deployed-in": {
                                             "container": "subnet",
-                                            "nodes": ["webtier", "app-tier", "db-tier", "internal-lb", "azure-external-lb"]
+                                            "nodes": ["webtier", "app-tier", "db-tier", "azure-internal-lb", "azure-external-lb"]
                                         }
                                     }
                                 }
@@ -444,10 +508,10 @@
                                                     "properties": {
                                                         "description": { "const": "Google Cloud" },
                                                         "nodes": {
-                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql", "google-external-lb"]
+                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql", "google-external-lb", "google-internal-lb"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms", "db-tier-composed-of-google-sql", "external-lb-to-webtier-google", "user-connects-to-lb-google", "components-in-subnet-google"]
+                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms", "db-tier-composed-of-google-sql", "external-lb-to-webtier-google", "user-connects-to-lb-google", "components-in-subnet-google", "webtier-to-internal-lb-google", "internal-lb-to-app-tier-google", "app-tier-to-db-tier"]
                                                         }
                                                     }
                                                 },
@@ -457,10 +521,10 @@
                                                     "properties": {
                                                         "description": { "const": "Amazon Web Services (AWS)" },
                                                         "nodes": {
-                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds", "aws-external-lb"]
+                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds", "aws-external-lb", "aws-internal-lb"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms", "db-tier-composed-of-aws-rds", "external-lb-to-webtier-aws", "user-connects-to-lb-aws", "components-in-subnet-aws"]
+                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms", "db-tier-composed-of-aws-rds", "external-lb-to-webtier-aws", "user-connects-to-lb-aws", "components-in-subnet-aws", "webtier-to-internal-lb-aws", "internal-lb-to-app-tier-aws", "app-tier-to-db-tier"]
                                                         }
                                                     }
                                                 },
@@ -469,10 +533,10 @@
                                                     "properties": {
                                                         "description": { "const": "Microsoft Azure" },
                                                         "nodes": {
-                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database", "azure-external-lb"]
+                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database", "azure-external-lb", "azure-internal-lb"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms", "db-tier-composed-of-azure-db", "external-lb-to-webtier-azure", "user-connects-to-lb-azure", "components-in-subnet-azure"]
+                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms", "db-tier-composed-of-azure-db", "external-lb-to-webtier-azure", "user-connects-to-lb-azure", "components-in-subnet-azure", "webtier-to-internal-lb-azure", "internal-lb-to-app-tier-azure", "app-tier-to-db-tier"]
                                                         }
                                                     }
                                                 }
