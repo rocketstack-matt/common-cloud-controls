@@ -335,14 +335,41 @@
                     ]
                 },
                 {
-                    "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
-                    "properties": {
-                        "unique-id": { "const": "object-store" },
-                        "name": { "const": "Object Store" },
-                        "description": { "const": "The object storage service." },
-                        "node-type": { "const": "storage" },
-                        "ccc-service": { "const": "Object Storage" }
-                    }
+                    "oneOf": [
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "google-cloud-storage" },
+                                "name": { "const": "Google Cloud Storage" },
+                                "description": { "const": "The object storage service from Google Cloud." },
+                                "node-type": { "const": "storage" },
+                                "ccc-service": { "const": "Object Storage" },
+                                "csp-service": { "const": "Cloud Storage" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "aws-s3" },
+                                "name": { "const": "Amazon S3" },
+                                "description": { "const": "The object storage service from AWS." },
+                                "node-type": { "const": "storage" },
+                                "ccc-service": { "const": "Object Storage" },
+                                "csp-service": { "const": "Amazon Simple Storage Service (Amazon S3)" }
+                            }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "azure-blob-storage" },
+                                "name": { "const": "Azure Blob Storage" },
+                                "description": { "const": "The object storage service from Azure." },
+                                "node-type": { "const": "storage" },
+                                "ccc-service": { "const": "Object Storage" },
+                                "csp-service": { "const": "Azure Blob Storage" }
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -512,21 +539,21 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-to-object-store-google" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "google-cloud-sql" }, "destination": { "node": "object-store" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "google-cloud-sql" }, "destination": { "node": "google-cloud-storage" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-to-object-store-aws" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-rds" }, "destination": { "node": "object-store" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-rds" }, "destination": { "node": "aws-s3" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "db-tier-to-object-store-azure" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-database" }, "destination": { "node": "object-store" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-database" }, "destination": { "node": "azure-blob-storage" } } } }
                             }
                         }
                     ]
@@ -648,7 +675,7 @@
                                                     "properties": {
                                                         "description": { "const": "Google Cloud" },
                                                         "nodes": {
-                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql", "google-external-lb", "google-internal-lb", "google-vpc", "google-subnet", "google-cloud-provider"]
+                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql", "google-external-lb", "google-internal-lb", "google-vpc", "google-subnet", "google-cloud-provider", "google-cloud-storage"]
                                                         },
                                                         "relationships": {
                                                             "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms", "db-tier-composed-of-google-sql", "external-lb-to-webtier-google", "user-connects-to-lb-google", "components-in-subnet-google", "webtier-to-internal-lb-google", "internal-lb-to-app-tier-google", "app-tier-to-db-tier", "subnet-in-vpc-google", "vpc-in-google-provider", "db-tier-to-object-store-google"]
@@ -661,7 +688,7 @@
                                                     "properties": {
                                                         "description": { "const": "Amazon Web Services (AWS)" },
                                                         "nodes": {
-                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds", "aws-external-lb", "aws-internal-lb", "aws-vpc", "aws-subnet", "aws-provider"]
+                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds", "aws-external-lb", "aws-internal-lb", "aws-vpc", "aws-subnet", "aws-provider", "aws-s3"]
                                                         },
                                                         "relationships": {
                                                             "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms", "db-tier-composed-of-aws-rds", "external-lb-to-webtier-aws", "user-connects-to-lb-aws", "components-in-subnet-aws", "webtier-to-internal-lb-aws", "internal-lb-to-app-tier-aws", "app-tier-to-db-tier", "subnet-in-vpc-aws", "vpc-in-aws-provider", "db-tier-to-object-store-aws"]
@@ -673,7 +700,7 @@
                                                     "properties": {
                                                         "description": { "const": "Microsoft Azure" },
                                                         "nodes": {
-                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database", "azure-external-lb", "azure-internal-lb", "azure-vnet", "azure-subnet", "azure-provider"]
+                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database", "azure-external-lb", "azure-internal-lb", "azure-vnet", "azure-subnet", "azure-provider", "azure-blob-storage"]
                                                         },
                                                         "relationships": {
                                                             "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms", "db-tier-composed-of-azure-db", "external-lb-to-webtier-azure", "user-connects-to-lb-azure", "components-in-subnet-azure", "webtier-to-internal-lb-azure", "internal-lb-to-app-tier-azure", "app-tier-to-db-tier", "subnet-in-vpc-azure", "vnet-in-azure-provider", "db-tier-to-object-store-azure"]
@@ -694,21 +721,21 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "vpc-in-google-provider" },
-                                "relationship-type": { "const": { "composed-of": { "container": "google-cloud-provider", "nodes": ["google-vpc", "object-store"] } } }
+                                "relationship-type": { "const": { "composed-of": { "container": "google-cloud-provider", "nodes": ["google-vpc", "google-cloud-storage"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "vpc-in-aws-provider" },
-                                "relationship-type": { "const": { "composed-of": { "container": "aws-provider", "nodes": ["aws-vpc", "object-store"] } } }
+                                "relationship-type": { "const": { "composed-of": { "container": "aws-provider", "nodes": ["aws-vpc", "aws-s3"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc1/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "vnet-in-azure-provider" },
-                                "relationship-type": { "const": { "composed-of": { "container": "azure-provider", "nodes": ["azure-vnet", "object-store"] } } }
+                                "relationship-type": { "const": { "composed-of": { "container": "azure-provider", "nodes": ["azure-vnet", "azure-blob-storage"] } } }
                             }
                         }
                     ]
