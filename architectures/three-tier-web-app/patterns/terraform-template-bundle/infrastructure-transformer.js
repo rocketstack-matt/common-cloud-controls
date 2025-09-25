@@ -174,8 +174,8 @@ function processNode(node, result) {
   if (nodeId.includes('web') || nodeType === 'web-server') {
     result.infrastructure.webTier = {
       ...result.infrastructure.webTier,
-      instanceCount: node.properties?.instance_count,
-      vmSize: node.properties?.vm_size,
+      instanceCount: node.instance_count || node.properties?.instance_count,
+      vmSize: node.vm_size || node.properties?.vm_size,
       port: extractInterfaceValue(node.interfaces, 'port') || node.properties?.port,
       containerImage: extractInterfaceValue(node.interfaces, 'image'),
       healthCheckPath: node.properties?.health_check_path,
@@ -187,8 +187,8 @@ function processNode(node, result) {
   if (nodeId.includes('app') || nodeType === 'application-server') {
     result.infrastructure.appTier = {
       ...result.infrastructure.appTier,
-      instanceCount: node.properties?.instance_count,
-      vmSize: node.properties?.vm_size,
+      instanceCount: node.instance_count || node.properties?.instance_count,
+      vmSize: node.vm_size || node.properties?.vm_size,
       port: extractInterfaceValue(node.interfaces, 'port') || node.properties?.port,
       containerImage: extractInterfaceValue(node.interfaces, 'image'),
       ...extractNodeProperties(node)
@@ -200,7 +200,7 @@ function processNode(node, result) {
     result.infrastructure.dataTier = {
       ...result.infrastructure.dataTier,
       dbType: node.properties?.database_type,
-      vmSize: node.properties?.vm_size,
+      vmSize: node.vm_size || node.properties?.vm_size,
       port: extractInterfaceValue(node.interfaces, 'port') || node.properties?.port,
       containerImage: extractInterfaceValue(node.interfaces, 'image'),
       ...extractNodeProperties(node)
@@ -321,21 +321,22 @@ function getDefaultLocation(provider) {
 }
 
 function getDefaultVmSize(provider, tier) {
+  // Updated defaults to match the pattern file const values
   const defaults = {
     azure: {
-      web: 'Standard_B2s',
-      app: 'Standard_B2ms',
-      database: 'Standard_D2s_v3'
+      web: 'Standard_B2s',      // matches webtier-azure-vms in pattern
+      app: 'Standard_B2ms',     // matches azure-app-server-vms in pattern
+      database: 'Standard_B2s'  // matches azure-mongodb-vm in pattern
     },
     aws: {
-      web: 't3.medium',
-      app: 't3.large', 
-      database: 'm5.large'
+      web: 't3.medium',         // matches webtier-ec2-vms in pattern
+      app: 't3.large',          // matches aws-app-server-vms in pattern
+      database: 't3.medium'     // matches aws-mongodb-ec2 in pattern
     },
     gcp: {
-      web: 'e2-medium',
-      app: 'e2-standard-2',
-      database: 'n1-standard-2'
+      web: 'e2-standard-2',     // matches webtier-google-compute-engine-vms in pattern
+      app: 'e2-standard-4',     // matches google-app-server-vms in pattern
+      database: 'e2-standard-2' // matches google-mongodb-vm in pattern
     }
   };
   return defaults[provider]?.[tier] || defaults.azure[tier];

@@ -97,6 +97,8 @@
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
                                 "csp-service": { "const": "Compute Engine Managed Instance Group" },
+                                "vm_size": { "const": "e2-standard-2" },
+                                "instance_count": { "const": 2 },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 3,
@@ -141,6 +143,8 @@
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
                                 "csp-service": { "const": "Amazon EC2 Auto Scaling with Launch Templates" },
+                                "vm_size": { "const": "t3.medium" },
+                                "instance_count": { "const": 2 },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 3,
@@ -185,6 +189,8 @@
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
                                 "csp-service": { "const": "Azure Virtual Machine Scale Sets" },
+                                "vm_size": { "const": "Standard_B2s" },
+                                "instance_count": { "const": 2 },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 3,
@@ -233,6 +239,8 @@
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
                                 "csp-service": { "const": "Compute Engine Managed Instance Group" },
+                                "vm_size": { "const": "e2-standard-4" },
+                                "instance_count": { "const": 2 },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 3,
@@ -275,6 +283,8 @@
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
                                 "csp-service": { "const": "Amazon EC2 Auto Scaling with Launch Templates" },
+                                "vm_size": { "const": "t3.large" },
+                                "instance_count": { "const": 2 },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 3,
@@ -317,6 +327,8 @@
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
                                 "csp-service": { "const": "Azure Virtual Machine Scale Sets" },
+                                "vm_size": { "const": "Standard_B2ms" },
+                                "instance_count": { "const": 2 },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 3,
@@ -363,6 +375,7 @@
                                 "node-type": { "const": "database" },
                                 "ccc-service": { "const": "Document Database" },
                                 "csp-service": { "const": "Compute Engine with MongoDB" },
+                                "vm_size": { "const": "e2-standard-2" },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 2,
@@ -394,6 +407,7 @@
                                 "node-type": { "const": "database" },
                                 "ccc-service": { "const": "Document Database" },
                                 "csp-service": { "const": "EC2 with MongoDB" },
+                                "vm_size": { "const": "t3.medium" },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 2,
@@ -425,6 +439,7 @@
                                 "node-type": { "const": "database" },
                                 "ccc-service": { "const": "Document Database" },
                                 "csp-service": { "const": "Virtual Machine with MongoDB" },
+                                "vm_size": { "const": "Standard_B2s" },
                                 "interfaces": {
                                     "type": "array",
                                     "maxItems": 2,
