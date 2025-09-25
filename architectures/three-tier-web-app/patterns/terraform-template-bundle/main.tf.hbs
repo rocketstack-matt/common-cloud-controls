@@ -1,0 +1,260 @@
+# Terraform Configuration for {{project_name}}
+# Generated from CALM Architecture Model
+# Cloud Provider: {{cloudProvider}}
+
+terraform {
+  required_version = ">= 1.0"
+  
+  required_providers {
+{{#if (eq cloudProvider "azure")}}
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+{{/if}}
+{{#if (eq cloudProvider "aws")}}
+    aws = {
+      source  = "hashicorp/aws" 
+      version = "~> 5.0"
+    }
+{{/if}}
+{{#if (eq cloudProvider "gcp")}}
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.0"
+    }
+{{/if}}
+  }
+}
+
+{{#if (eq cloudProvider "azure")}}
+# Configure Azure Provider
+provider "azurerm" {
+  features {}
+}
+
+# Resource Group
+resource "azurerm_resource_group" "main" {
+  name     = "rg-${var.project_name}-${var.environment}"
+  location = var.location
+  
+  tags = var.common_tags
+}
+
+# Virtual Network
+resource "azurerm_virtual_network" "main" {
+  name                = "vnet-${var.project_name}-${var.environment}"
+  address_space       = [var.vnet_address_space]
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  
+  tags = var.common_tags
+}
+
+# Subnets
+resource "azurerm_subnet" "web" {
+  name                 = "subnet-web"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_subnet" "app" {
+  name                 = "subnet-app"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
+resource "azurerm_subnet" "data" {
+  name                 = "subnet-data"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.3.0/24"]
+}
+
+# Public IP for Load Balancer
+resource "azurerm_public_ip" "lb" {
+  name                = "pip-lb-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  allocation_method   = "Static"
+  sku                = "Standard"
+  
+  tags = var.common_tags
+}
+
+# Load Balancer
+resource "azurerm_lb" "main" {
+  name                = "lb-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                = "Standard"
+
+  frontend_ip_configuration {
+    name                 = "PublicIPAddress"
+    public_ip_address_id = azurerm_public_ip.lb.id
+  }
+
+  tags = var.common_tags
+}
+
+# Virtual Machine Scale Set for Web Tier
+resource "azurerm_linux_virtual_machine_scale_set" "web" {
+  name                = "vmss-web-${var.project_name}-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  sku                 = var.web_vm_size
+  instances           = var.web_vm_count
+  
+  disable_password_authentication = true
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
+    version   = "latest"
+  }
+
+  os_disk {
+    storage_account_type = "Premium_LRS"
+    caching              = "ReadWrite"
+  }
+
+  network_interface {
+    name    = "web-nic"
+    primary = true
+
+    ip_configuration {
+      name      = "internal"
+      primary   = true
+      subnet_id = azurerm_subnet.web.id
+    }
+  }
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = var.ssh_public_key
+  }
+
+  admin_username = "azureuser"
+
+  # Custom startup script to install Docker and run container
+  custom_data = base64encode(templatefile("${path.module}/scripts/web-startup.sh", {
+    web_container_image = var.web_container_image
+    web_container_port  = var.web_container_port
+    app_lb_ip          = "10.0.2.100"  # Internal LB IP for app tier
+  }))
+
+  tags = var.common_tags
+}
+
+# Virtual Machine Scale Set for App Tier
+resource "azurerm_linux_virtual_machine_scale_set" "app" {
+  name                = "vmss-app-${var.project_name}-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  sku                 = var.app_vm_size
+  instances           = var.app_vm_count
+  
+  disable_password_authentication = true
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
+    version   = "latest"
+  }
+
+  os_disk {
+    storage_account_type = "Premium_LRS"
+    caching              = "ReadWrite"
+  }
+
+  network_interface {
+    name    = "app-nic"
+    primary = true
+
+    ip_configuration {
+      name      = "internal"
+      primary   = true
+      subnet_id = azurerm_subnet.app.id
+    }
+  }
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = var.ssh_public_key
+  }
+
+  admin_username = "azureuser"
+
+  # Custom startup script to install Docker and run container
+  custom_data = base64encode(templatefile("${path.module}/scripts/app-startup.sh", {
+    app_container_image = var.app_container_image
+    app_container_port  = var.app_container_port
+    database_ip        = "10.0.3.10"  # Database VM IP
+    database_port      = var.database_container_port
+  }))
+
+  tags = var.common_tags
+}
+
+# Virtual Machine for Database
+resource "azurerm_linux_virtual_machine" "db" {
+  name                = "vm-db-${var.project_name}-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = var.database_vm_size
+  admin_username      = "azureuser"
+
+  disable_password_authentication = true
+
+  network_interface_ids = [
+    azurerm_network_interface.db.id,
+  ]
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = var.ssh_public_key
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
+    version   = "latest"
+  }
+
+  # Custom startup script to install Docker and run database container
+  custom_data = base64encode(templatefile("${path.module}/scripts/db-startup.sh", {
+    database_container_image = var.database_container_image
+    database_container_port  = var.database_container_port
+    database_root_password   = var.database_root_password
+    database_name           = var.database_name
+  }))
+
+  tags = var.common_tags
+}
+
+# Network Interface for Database VM
+resource "azurerm_network_interface" "db" {
+  name                = "nic-db-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.data.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = "10.0.3.10"
+  }
+
+  tags = var.common_tags
+}
+{{/if}}

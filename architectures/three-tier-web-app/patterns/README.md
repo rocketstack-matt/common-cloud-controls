@@ -2,6 +2,166 @@
 
 This document provides an overview of the Common Architecture Language Model (CALM) and explains how it's used in this reference architecture. It also provides instructions for generating a concrete architecture from the provided CALM pattern using the CALM CLI.
 
+## 🚀 Terraform Code Generation
+
+This pattern includes a **Terraform Template Bundle** that can generate Infrastructure as Code (IaC) from your CALM architecture models.
+
+### Required Metadata for Terraform Generation
+
+When creating or customizing architectures from this pattern, you **must** provide the following metadata values for successful Terraform code generation:
+
+#### 📋 Required Metadata Fields
+
+| Field | Placeholder | Description | Example Values |
+|-------|-------------|-------------|----------------|
+| `project-name` | `[[ PROJECT_NAME ]]` | Name of your project (used for resource naming) | `my-webapp`, `ecommerce-platform` |
+| `environment` | `[[ ENVIRONMENT ]]` | Environment type | `dev`, `staging`, `prod` |
+| `location` | `[[ CLOUD_REGION ]]` | Cloud region for deployment | Azure: `eastus`, `westus2`<br>AWS: `us-east-1`, `us-west-2`<br>GCP: `us-central1`, `europe-west1` |
+| `resource-group-name` | `[[ RESOURCE_GROUP_NAME ]]` | Cloud resource group/project name | `rg-mywebapp-prod`, `my-project-123` |
+
+#### ✏️ How to Fill In Metadata
+
+Replace the placeholders in your architecture JSON file:
+
+```json
+{
+  "metadata": [
+    {
+      "name": "project-name",
+      "value": "my-webapp",
+      "description": "Name of the project (used for resource naming)"
+    },
+    {
+      "name": "environment", 
+      "value": "prod",
+      "description": "Environment (dev, staging, prod)"
+    },
+    {
+      "name": "location",
+      "value": "eastus",
+      "description": "Cloud region for deployment"
+    },
+    {
+      "name": "resource-group-name",
+      "value": "rg-mywebapp-prod", 
+      "description": "Cloud resource group/project name"
+    }
+  ]
+}
+```
+
+### 🔧 Generating Terraform Code
+
+Once you've filled in the metadata, generate Terraform code with:
+
+```bash
+npx calm template \
+  --architecture ./azure.json \
+  --bundle ./terraform-template-bundle \
+  --output ./generated-terraform
+```
+
+This will create:
+- `main.tf` - Infrastructure resources
+- `variables.tf` - Parameterized inputs  
+- `outputs.tf` - Resource outputs
+
+### 📁 Template Bundle Structure
+
+The `terraform-template-bundle/` directory contains:
+- **Templates**: Handlebars templates for Terraform files
+- **Transformer**: JavaScript logic to extract data from CALM models
+- **Multi-cloud Support**: Azure, AWS, and GCP configurations
+
+### 🚀 Running the Generated Terraform
+
+After generating your Terraform files, follow these steps to deploy your infrastructure:
+
+#### Prerequisites
+
+1. **Install Terraform**: Download from [terraform.io](https://www.terraform.io/downloads)
+2. **Cloud CLI**: Install the appropriate cloud provider CLI:
+   - **Azure**: [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+   - **AWS**: [AWS CLI](https://aws.amazon.com/cli/)
+   - **GCP**: [gcloud CLI](https://cloud.google.com/sdk/docs/install)
+
+#### Authentication
+
+**For Azure:**
+```bash
+az login
+az account set --subscription "your-subscription-id"
+```
+
+**For AWS:**
+```bash
+aws configure
+# Enter your Access Key ID, Secret Access Key, and region
+```
+
+**For GCP:**
+```bash
+gcloud auth login
+gcloud config set project your-project-id
+```
+
+#### SSH Key Setup (Required for VMs)
+
+Generate an SSH key pair for VM access:
+
+```bash
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/terraform-key
+```
+
+#### Deployment Steps
+
+1. **Navigate to the generated directory**:
+   ```bash
+   cd generated-terraform
+   ```
+
+2. **Initialize Terraform**:
+   ```bash
+   terraform init
+   ```
+
+3. **Review the plan**:
+   ```bash
+   terraform plan
+   ```
+
+4. **Apply the configuration**:
+   ```bash
+   terraform apply
+   ```
+
+5. **Access your application**:
+   After deployment, Terraform will output the application URL and other connection details.
+
+#### Cleanup
+
+To destroy the infrastructure when no longer needed:
+
+```bash
+terraform destroy
+```
+
+#### Common Variables to Customize
+
+You can customize the deployment by modifying `variables.tf` or creating a `terraform.tfvars` file:
+
+```hcl
+# terraform.tfvars
+project_name = "my-webapp"
+environment = "dev"
+web_vm_count = 3
+app_vm_count = 2
+web_vm_size = "Standard_B1s"
+app_vm_size = "Standard_B2s"
+database_vm_size = "Standard_D2s_v3"
+ssh_public_key_path = "~/.ssh/terraform-key.pub"
+```
+
 ## What is CALM?
 
 **CALM** (Common Architecture Language Model) is a declarative, JSON-based modeling language for describing complex systems. It allows you to define the components of an architecture (nodes), the relationships between them, and the data flows that traverse the system.

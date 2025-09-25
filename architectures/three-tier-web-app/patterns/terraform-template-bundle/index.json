@@ -1,0 +1,76 @@
+{
+  "name": "terraform-three-tier-web-app",
+  "version": "1.0.0",
+  "description": "CALM Template Bundle for generating Terraform infrastructure from three-tier web app patterns",
+  "transformer": "infrastructure-transformer",
+  "templates": [
+    {
+      "template": "main.tf.hbs",
+      "from": "document",
+      "output": "main.tf",
+      "output-type": "single"
+    },
+    {
+      "template": "variables.tf.hbs",
+      "from": "document",
+      "output": "variables.tf",
+      "output-type": "single"
+    },
+    {
+      "template": "outputs.tf.hbs",
+      "from": "document",
+      "output": "outputs.tf",
+      "output-type": "single"
+    },
+    {
+      "template": "web-startup.sh.hbs",
+      "from": "document",
+      "output": "scripts/web-startup.sh",
+      "output-type": "single"
+    },
+    {
+      "template": "app-startup.sh.hbs",
+      "from": "document",
+      "output": "scripts/app-startup.sh",
+      "output-type": "single"
+    },
+    {
+      "template": "db-startup.sh.hbs",
+      "from": "document",
+      "output": "scripts/db-startup.sh",
+      "output-type": "single"
+    }
+  ],
+  "supportedPatterns": [
+    "three-tier-web-app"
+  ],
+  "cloudProviderConfigs": {
+    "azure": {
+      "requiredProviders": ["azurerm"],
+      "defaultRegion": "East US",
+      "vmSizes": {
+        "web": "Standard_B2s",
+        "app": "Standard_B2ms", 
+        "database": "Standard_D2s_v3"
+      }
+    },
+    "aws": {
+      "requiredProviders": ["aws"],
+      "defaultRegion": "us-east-1",
+      "instanceTypes": {
+        "web": "t3.medium",
+        "app": "t3.large",
+        "database": "m5.large"
+      }
+    },
+    "gcp": {
+      "requiredProviders": ["google"],
+      "defaultRegion": "us-central1",
+      "machineTypes": {
+        "web": "e2-medium",
+        "app": "e2-standard-2",
+        "database": "n1-standard-2"
+      }
+    }
+  }
+}

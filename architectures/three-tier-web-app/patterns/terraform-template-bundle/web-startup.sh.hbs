@@ -1,0 +1,131 @@
+#!/bin/bash
+# Web Tier Startup Script
+# This script installs Docker and runs the containerized web application
+
+set -e
+
+# Variables from Terraform templatefile
+WEB_CONTAINER_IMAGE="${web_container_image}"
+WEB_CONTAINER_PORT="${web_container_port}"
+APP_LB_IP="${app_lb_ip}"
+
+# Update system packages
+apt-get update
+apt-get upgrade -y
+
+# Install Docker
+apt-get install -y ca-certificates curl gnupg lsb-release
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Start Docker service
+systemctl enable docker
+systemctl start docker
+
+# Install Nginx for reverse proxy
+apt-get install -y nginx
+
+# Configure Nginx as reverse proxy to app tier
+cat > /etc/nginx/sites-available/default << EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name _;
+
+    # Proxy to app tier through load balancer
+    location / {
+        proxy_pass http://${app_lb_ip}:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        
+        # Health check for load balancer
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 5s;
+        proxy_read_timeout 5s;
+    }
+
+    # Dedicated health check endpoint for load balancer
+    location /health {
+        access_log off;
+        return 200 "healthy\\n";
+        add_header Content-Type text/plain;
+    }
+
+    # Direct container access for development
+    location /direct {
+        proxy_pass http://localhost:${web_container_port};
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+EOF
+
+# Test nginx configuration
+nginx -t
+
+# Start the web container from CALM model
+echo "Starting web container: ${web_container_image}"
+docker pull "${web_container_image}"
+docker run -d \
+  --name web-app \
+  --restart unless-stopped \
+  -p ${web_container_port}:8080 \
+  -e NODE_ENV=production \
+  "${web_container_image}"
+
+# Wait for container to be healthy
+sleep 10
+
+# Enable and start nginx
+systemctl enable nginx
+systemctl start nginx
+
+# Configure log rotation
+cat > /etc/logrotate.d/nginx << 'EOF'
+/var/log/nginx/*.log {
+    daily
+    compress
+    copytruncate
+    delaycompress
+    missingok
+    notifempty
+    rotate 30
+}
+EOF
+
+# Create a simple status page showing container info
+mkdir -p /var/www/html
+cat > /var/www/html/status.html << EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Tier Status</title>
+</head>
+<body>
+    <h1>Web Tier - Running</h1>
+    <p>Container Image: ${web_container_image}</p>
+    <p>Container Port: ${web_container_port}</p>
+    <p>Timestamp: \$(date)</p>
+    <p>Hostname: \$(hostname)</p>
+    <p>Docker Status: \$(docker ps | grep web-app)</p>
+</body>
+</html>
+EOF
+
+# Set up monitoring and logging
+apt-get install -y rsyslog
+systemctl enable rsyslog
+systemctl start rsyslog
+
+# Create startup completion marker
+touch /var/log/web-startup-complete
+
+echo "Web tier startup completed successfully" >> /var/log/web-startup.log
+echo "Container ${web_container_image} running on port ${web_container_port}" >> /var/log/web-startup.log
