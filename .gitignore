@@ -8,3 +8,4 @@ delivery-toolkit/artifacts
 architectures/three-tier-web-app/architectures/patterns/website
 .gitignore
 .idea/
+**/generated-terraform
