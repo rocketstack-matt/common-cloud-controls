@@ -3,8 +3,6 @@
  * Transforms CALM architecture models into template variables for Terraform generation
  */
 
-
-
 class InfrastructureTransformer {
   registerTemplateHelpers() {
     return {
@@ -93,7 +91,13 @@ function transform(calmModel) {
     const metadataMap = {};
     calmModel.metadata.forEach(item => {
       if (item.name && item.value) {
+        // Format: { name: "project-name", value: "my-project" }
         metadataMap[item.name] = item.value;
+      } else {
+        // Format: { "project-name": "my-project", "environment": "dev", ... }
+        Object.keys(item).forEach(key => {
+          metadataMap[key] = item[key];
+        });
       }
     });
     
@@ -104,13 +108,13 @@ function transform(calmModel) {
       resourceGroup: metadataMap['resource-group-name'],
       description: calmModel.description
     };
-  } else {
-    // Fallback for legacy metadata format
+  } else if (calmModel.metadata && typeof calmModel.metadata === 'object') {
+    // Single object format: { "project-name": "my-project", ... }
     result.project = {
-      name: calmModel.metadata?.find(m => m.name === 'project-name')?.value,
-      environment: calmModel.metadata?.find(m => m.name === 'environment')?.value,
-      location: calmModel.metadata?.find(m => m.name === 'location')?.value,
-      resourceGroup: calmModel.metadata?.find(m => m.name === 'resource-group-name')?.value,
+      name: calmModel.metadata['project-name'],
+      environment: calmModel.metadata['environment'],
+      location: calmModel.metadata['location'],
+      resourceGroup: calmModel.metadata['resource-group-name'],
       description: calmModel.description
     };
   }
@@ -160,8 +164,8 @@ function detectCloudProvider(calmModel) {
 function processNode(node, result) {
   if (!node) return;
   
-  const nodeId = (node['unique-id'] || node.unique_id || node.id || '').toString().toLowerCase();
-  const nodeType = node['node-type'] || node.node_type || node.type || '';
+  const nodeId = node['unique-id'] || node.unique_id || node.id;
+  if (!nodeId) return;
 
   // Extract interface data for container images and ports
   const extractInterfaceValue = (interfaces, key) => {
@@ -170,8 +174,76 @@ function processNode(node, result) {
     return interfaceItem ? interfaceItem[key] : undefined;
   };
 
+  // Extract interface data for URLs (these are typically outputs, not inputs)
+  const extractUrlInterface = (interfaces) => {
+    if (!Array.isArray(interfaces)) return undefined;
+    const urlInterface = interfaces.find(iface => iface.url);
+    return urlInterface ? {
+      interfaceId: urlInterface['unique-id'],
+      url: urlInterface.url === '[[ URL ]]' ? undefined : urlInterface.url // Don't use placeholder values
+    } : undefined;
+  };
+
+  // Define explicit node mappings based on unique-id from the pattern
+  const WEB_TIER_NODES = [
+    'webtier-google-compute-engine-vms',
+    'webtier-ec2-vms', 
+    'webtier-azure-vms'
+  ];
+
+  const APP_TIER_NODES = [
+    'google-app-server-vms',
+    'aws-app-server-vms',
+    'azure-app-server-vms'
+  ];
+
+  const DATABASE_NODES = [
+    'google-mongodb-vm',
+    'aws-mongodb-ec2',
+    'azure-mongodb-vm'
+  ];
+
+  const NETWORKING_NODES = [
+    'google-vpc',
+    'aws-vpc', 
+    'azure-vnet'
+  ];
+
+  const SUBNET_NODES = [
+    'google-subnet',
+    'aws-subnet',
+    'azure-subnet'
+  ];
+
+  const LOAD_BALANCER_NODES = [
+    'google-external-lb',
+    'google-internal-lb',
+    'aws-external-lb',
+    'aws-internal-lb', 
+    'azure-external-lb',
+    'azure-internal-lb'
+  ];
+
+  const STORAGE_NODES = [
+    'google-cloud-storage',
+    'aws-s3',
+    'azure-blob-storage'
+  ];
+
+  const NSG_NODES = [
+    'web-tier-nsg',
+    'app-tier-nsg', 
+    'db-tier-nsg'
+  ];
+
+  const NETWORK_COMPONENT_NODES = [
+    'azure-external-lb-ip',
+    'azure-mongodb-vm-nic'
+  ];
+
   // Process web tier nodes
-  if (nodeId.includes('web') || nodeType === 'web-server') {
+  if (WEB_TIER_NODES.includes(nodeId)) {
+    const urlInterface = extractUrlInterface(node.interfaces);
     result.infrastructure.webTier = {
       ...result.infrastructure.webTier,
       instanceCount: node.instance_count || node.properties?.instance_count,
@@ -179,12 +251,14 @@ function processNode(node, result) {
       port: extractInterfaceValue(node.interfaces, 'port') || node.properties?.port,
       containerImage: extractInterfaceValue(node.interfaces, 'image'),
       healthCheckPath: node.properties?.health_check_path,
+      // Store URL interface info for potential output generation
+      urlInterface: urlInterface,
       ...extractNodeProperties(node)
     };
   }
 
   // Process app tier nodes  
-  if (nodeId.includes('app') || nodeType === 'application-server') {
+  if (APP_TIER_NODES.includes(nodeId)) {
     result.infrastructure.appTier = {
       ...result.infrastructure.appTier,
       instanceCount: node.instance_count || node.properties?.instance_count,
@@ -196,7 +270,7 @@ function processNode(node, result) {
   }
 
   // Process database tier nodes
-  if (nodeId.includes('database') || nodeId.includes('mongodb') || nodeType === 'database') {
+  if (DATABASE_NODES.includes(nodeId)) {
     result.infrastructure.dataTier = {
       ...result.infrastructure.dataTier,
       dbType: node.properties?.database_type,
@@ -207,8 +281,8 @@ function processNode(node, result) {
     };
   }
 
-  // Process networking nodes
-  if (nodeId.includes('vnet') || nodeId.includes('vpc') || nodeType === 'network') {
+  // Process networking nodes (VPC/VNet)
+  if (NETWORKING_NODES.includes(nodeId)) {
     result.infrastructure.networking = {
       ...result.infrastructure.networking,
       addressSpace: node.properties?.address_space,
@@ -217,8 +291,18 @@ function processNode(node, result) {
     };
   }
 
+  // Process subnet nodes
+  if (SUBNET_NODES.includes(nodeId)) {
+    result.infrastructure.networking = {
+      ...result.infrastructure.networking,
+      addressSpace: result.infrastructure.networking.addressSpace || node.properties?.address_space,
+      subnets: result.infrastructure.networking.subnets || node.properties?.subnets,
+      ...extractNodeProperties(node)
+    };
+  }
+
   // Process load balancer nodes
-  if (nodeId.includes('loadbalancer') || nodeId.includes('lb') || nodeType === 'load-balancer') {
+  if (LOAD_BALANCER_NODES.includes(nodeId)) {
     const lbType = nodeId.includes('external') ? 'external' : 'internal';
     result.infrastructure.loadBalancing[lbType] = {
       ...result.infrastructure.loadBalancing[lbType],
@@ -228,11 +312,30 @@ function processNode(node, result) {
   }
 
   // Process storage nodes
-  if (nodeId.includes('storage') || nodeId.includes('blob') || nodeType === 'storage') {
+  if (STORAGE_NODES.includes(nodeId)) {
     result.infrastructure.storage = {
       ...result.infrastructure.storage,
       accountTier: node.properties?.account_tier,
       replicationType: node.properties?.replication_type,
+      ...extractNodeProperties(node)
+    };
+  }
+
+  // Process NSG nodes (these are implementation details for security)
+  if (NSG_NODES.includes(nodeId)) {
+    result.infrastructure.security = result.infrastructure.security || {};
+    result.infrastructure.security[nodeId] = {
+      nodeId: nodeId,
+      tier: nodeId.replace('-tier-nsg', ''),
+      ...extractNodeProperties(node)
+    };
+  }
+
+  // Process network component nodes (supporting infrastructure)
+  if (NETWORK_COMPONENT_NODES.includes(nodeId)) {
+    result.infrastructure.networkComponents = result.infrastructure.networkComponents || {};
+    result.infrastructure.networkComponents[nodeId] = {
+      nodeId: nodeId,
       ...extractNodeProperties(node)
     };
   }
@@ -252,94 +355,88 @@ function processRelationship(relationship, result) {
 function extractNodeProperties(node) {
   const properties = {};
   
+  // Extract direct node properties (like vm_size, instance_count)
+  const nodePropertyKeys = ['vm_size', 'instance_count', 'database_type', 'account_tier', 'replication_type', 'sku', 'address_space', 'subnets'];
+  nodePropertyKeys.forEach(key => {
+    if (node[key] !== undefined) {
+      properties[key] = node[key];
+    }
+  });
+  
+  // Extract nested properties object
   if (node.properties) {
     Object.keys(node.properties).forEach(key => {
       properties[key] = node.properties[key];
     });
   }
 
+  // Extract node metadata (can be array or object format)
   if (node.metadata) {
-    node.metadata.forEach(meta => {
-      properties[`metadata_${meta.name}`] = meta.value;
-    });
+    if (Array.isArray(node.metadata)) {
+      node.metadata.forEach(meta => {
+        if (meta.name && meta.value) {
+          // Format: { name: "key", value: "value" }
+          properties[`metadata_${meta.name}`] = meta.value;
+        } else {
+          // Format: { "key": "value", ... }
+          Object.keys(meta).forEach(key => {
+            properties[`metadata_${key}`] = meta[key];
+          });
+        }
+      });
+    } else if (typeof node.metadata === 'object') {
+      // Single object format
+      Object.keys(node.metadata).forEach(key => {
+        properties[`metadata_${key}`] = node.metadata[key];
+      });
+    }
   }
 
   return properties;
 }
 
 function generateTerraformVariables(result) {
-  const cloudProvider = result.cloudProvider || 'azure';
+  const cloudProvider = result.cloudProvider;
   
   result.variables = {
     // Project variables from CALM metadata
-    project_name: result.project.name || 'calm-demo',
-    environment: result.project.environment || 'demo', 
-    resource_group_name: result.project.resourceGroup || 'demo-rg',
-    location: result.project.location || getDefaultLocation(cloudProvider),
+    project_name: result.project.name,
+    environment: result.project.environment, 
+    resource_group_name: result.project.resourceGroup,
+    location: result.project.location,
     
-    // Web tier variables with defaults
-    web_vm_count: result.infrastructure.webTier.instanceCount || 2,
-    web_vm_size: result.infrastructure.webTier.vmSize || getDefaultVmSize(cloudProvider, 'web'),
-    web_container_image: result.infrastructure.webTier.containerImage || 'nginx:latest',
-    web_container_port: result.infrastructure.webTier.port || 8080,
+    // Web tier variables
+    web_vm_count: result.infrastructure.webTier.instanceCount,
+    web_vm_size: result.infrastructure.webTier.vmSize,
+    web_container_image: result.infrastructure.webTier.containerImage,
+    web_container_port: result.infrastructure.webTier.port,
     
-    // App tier variables with defaults
-    app_vm_count: result.infrastructure.appTier.instanceCount || 2,
-    app_vm_size: result.infrastructure.appTier.vmSize || getDefaultVmSize(cloudProvider, 'app'),
-    app_container_image: result.infrastructure.appTier.containerImage || 'finos/calm-hub:latest',
-    app_container_port: result.infrastructure.appTier.port || 8080,
+    // App tier variables
+    app_vm_count: result.infrastructure.appTier.instanceCount,
+    app_vm_size: result.infrastructure.appTier.vmSize,
+    app_container_image: result.infrastructure.appTier.containerImage,
+    app_container_port: result.infrastructure.appTier.port,
     
-    // Database variables with defaults
-    database_vm_size: result.infrastructure.dataTier.vmSize || getDefaultVmSize(cloudProvider, 'database'),
-    database_type: result.infrastructure.dataTier.dbType || 'MongoDB',
-    database_container_image: result.infrastructure.dataTier.containerImage || 'mongo:latest',
-    database_container_port: result.infrastructure.dataTier.port || 27017,
+    // Database variables
+    database_vm_size: result.infrastructure.dataTier.vmSize,
+    database_type: result.infrastructure.dataTier.dbType,
+    database_container_image: result.infrastructure.dataTier.containerImage,
+    database_container_port: result.infrastructure.dataTier.port,
     
-    // Networking variables with defaults
-    vnet_address_space: result.infrastructure.networking.addressSpace || '10.0.0.0/16',
+    // Networking variables
+    vnet_address_space: result.infrastructure.networking.addressSpace || "10.0.0.0/16",
     
     // Add owner field that templates reference
-    owner: result.project.owner || 'CALM-Generated',
+    owner: result.project.owner,
     
-    // Tags using real project metadata
+    // Tags using project metadata
     common_tags: {
-      Project: result.project.name || 'calm-demo',
-      Environment: result.project.environment || 'demo',
+      Project: result.project.name,
+      Environment: result.project.environment,
       ManagedBy: 'Terraform',
       CreatedFrom: 'CALM-Template'
     }
   };
-}
-
-function getDefaultLocation(provider) {
-  const defaults = {
-    azure: 'East US',
-    aws: 'us-east-1', 
-    gcp: 'us-central1'
-  };
-  return defaults[provider] || defaults.azure;
-}
-
-function getDefaultVmSize(provider, tier) {
-  // Updated defaults to match the pattern file const values
-  const defaults = {
-    azure: {
-      web: 'Standard_B2s',      // matches webtier-azure-vms in pattern
-      app: 'Standard_B2ms',     // matches azure-app-server-vms in pattern
-      database: 'Standard_B2s'  // matches azure-mongodb-vm in pattern
-    },
-    aws: {
-      web: 't3.medium',         // matches webtier-ec2-vms in pattern
-      app: 't3.large',          // matches aws-app-server-vms in pattern
-      database: 't3.medium'     // matches aws-mongodb-ec2 in pattern
-    },
-    gcp: {
-      web: 'e2-standard-2',     // matches webtier-google-compute-engine-vms in pattern
-      app: 'e2-standard-4',     // matches google-app-server-vms in pattern
-      database: 'e2-standard-2' // matches google-mongodb-vm in pattern
-    }
-  };
-  return defaults[provider]?.[tier] || defaults.azure[tier];
 }
 
 // Export the transformer class as ES module default export  

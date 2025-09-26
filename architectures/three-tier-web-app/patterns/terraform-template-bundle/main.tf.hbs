@@ -38,7 +38,9 @@ resource "azurerm_resource_group" "main" {
   name     = "rg-${var.project_name}-${var.environment}"
   location = var.location
   
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-provider"
+  })
 }
 
 # Virtual Network
@@ -48,29 +50,98 @@ resource "azurerm_virtual_network" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-vnet"
+  })
 }
 
-# Subnets
-resource "azurerm_subnet" "web" {
-  name                 = "subnet-web"
+# Subnets (consolidated single subnet for all tiers)
+resource "azurerm_subnet" "main" {
+  name                 = "subnet-main-${var.project_name}-${var.environment}"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.1.0/24"]
+  
+  # Note: Azure subnets do not support tags
 }
 
-resource "azurerm_subnet" "app" {
-  name                 = "subnet-app"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = ["10.0.2.0/24"]
+# Network Security Groups for tier-specific security
+resource "azurerm_network_security_group" "web" {
+  name                = "nsg-web-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "HTTP"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTPS"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = merge(var.common_tags, {
+    calm-unique-id = "web-tier-nsg"
+  })
 }
 
-resource "azurerm_subnet" "data" {
-  name                 = "subnet-data"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = ["10.0.3.0/24"]
+resource "azurerm_network_security_group" "app" {
+  name                = "nsg-app-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "AppTier"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = var.app_container_port
+    source_address_prefix      = "10.0.1.0/24"
+    destination_address_prefix = "*"
+  }
+
+  tags = merge(var.common_tags, {
+    calm-unique-id = "app-tier-nsg"
+  })
+}
+
+resource "azurerm_network_security_group" "db" {
+  name                = "nsg-db-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  security_rule {
+    name                       = "MongoDB"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "27017"
+    source_address_prefix      = "10.0.1.0/24"
+    destination_address_prefix = "*"
+  }
+
+  tags = merge(var.common_tags, {
+    calm-unique-id = "db-tier-nsg"
+  })
 }
 
 # Public IP for Load Balancer
@@ -81,10 +152,12 @@ resource "azurerm_public_ip" "lb" {
   allocation_method   = "Static"
   sku                = "Standard"
   
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-external-lb-ip"
+  })
 }
 
-# Load Balancer
+# External Load Balancer
 resource "azurerm_lb" "main" {
   name                = "lb-${var.project_name}-${var.environment}"
   location            = azurerm_resource_group.main.location
@@ -96,7 +169,27 @@ resource "azurerm_lb" "main" {
     public_ip_address_id = azurerm_public_ip.lb.id
   }
 
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-external-lb"
+  })
+}
+
+# Internal Load Balancer
+resource "azurerm_lb" "internal" {
+  name                = "lb-internal-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                = "Standard"
+
+  frontend_ip_configuration {
+    name                          = "InternalIPAddress"
+    subnet_id                     = azurerm_subnet.main.id
+    private_ip_address_allocation = "Dynamic"
+  }
+
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-internal-lb"
+  })
 }
 
 # Virtual Machine Scale Set for Web Tier
@@ -124,11 +217,12 @@ resource "azurerm_linux_virtual_machine_scale_set" "web" {
   network_interface {
     name    = "web-nic"
     primary = true
+    network_security_group_id = azurerm_network_security_group.web.id
 
     ip_configuration {
       name      = "internal"
       primary   = true
-      subnet_id = azurerm_subnet.web.id
+      subnet_id = azurerm_subnet.main.id
     }
   }
 
@@ -143,10 +237,12 @@ resource "azurerm_linux_virtual_machine_scale_set" "web" {
   custom_data = base64encode(templatefile("${path.module}/scripts/web-startup.sh", {
     web_container_image = var.web_container_image
     web_container_port  = var.web_container_port
-    app_lb_ip          = "10.0.2.100"  # Internal LB IP for app tier
+    app_lb_ip          = azurerm_lb.internal.frontend_ip_configuration[0].private_ip_address
   }))
 
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "webtier-azure-vms"
+  })
 }
 
 # Virtual Machine Scale Set for App Tier
@@ -174,11 +270,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "app" {
   network_interface {
     name    = "app-nic"
     primary = true
+    network_security_group_id = azurerm_network_security_group.app.id
 
     ip_configuration {
-      name      = "internal"
-      primary   = true
-      subnet_id = azurerm_subnet.app.id
+      name                                   = "internal"
+      primary                                = true
+      subnet_id                              = azurerm_subnet.main.id
+      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.internal.id]
     }
   }
 
@@ -193,11 +291,40 @@ resource "azurerm_linux_virtual_machine_scale_set" "app" {
   custom_data = base64encode(templatefile("${path.module}/scripts/app-startup.sh", {
     app_container_image = var.app_container_image
     app_container_port  = var.app_container_port
-    database_ip        = "10.0.3.10"  # Database VM IP
+    database_ip        = "10.0.1.10"  # Database VM IP in single subnet
     database_port      = var.database_container_port
   }))
 
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-app-server-vms"
+  })
+}
+
+# Internal Load Balancer Backend Pool
+resource "azurerm_lb_backend_address_pool" "internal" {
+  loadbalancer_id = azurerm_lb.internal.id
+  name            = "BackEndAddressPool"
+}
+
+# Internal Load Balancer Health Probe
+resource "azurerm_lb_probe" "internal" {
+  loadbalancer_id = azurerm_lb.internal.id
+  name            = "app-health-probe"
+  port            = var.app_container_port
+  protocol        = "Http"
+  request_path    = "/health"
+}
+
+# Internal Load Balancer Rule
+resource "azurerm_lb_rule" "internal" {
+  loadbalancer_id                = azurerm_lb.internal.id
+  name                           = "LBRule"
+  protocol                       = "Tcp"
+  frontend_port                  = var.app_container_port
+  backend_port                   = var.app_container_port
+  frontend_ip_configuration_name = "InternalIPAddress"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.internal.id]
+  probe_id                       = azurerm_lb_probe.internal.id
 }
 
 # Virtual Machine for Database
@@ -239,7 +366,9 @@ resource "azurerm_linux_virtual_machine" "db" {
     database_name           = var.database_name
   }))
 
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-mongodb-vm"
+  })
 }
 
 # Network Interface for Database VM
@@ -250,11 +379,19 @@ resource "azurerm_network_interface" "db" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.data.id
+    subnet_id                     = azurerm_subnet.main.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = "10.0.3.10"
+    private_ip_address            = "10.0.1.10"
   }
 
-  tags = var.common_tags
+  tags = merge(var.common_tags, {
+    calm-unique-id = "azure-mongodb-vm-nic"
+  })
+}
+
+# Associate Database NSG with Database NIC
+resource "azurerm_network_interface_security_group_association" "db" {
+  network_interface_id      = azurerm_network_interface.db.id
+  network_security_group_id = azurerm_network_security_group.db.id
 }
 {{/if}}

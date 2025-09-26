@@ -123,7 +123,7 @@ variable "common_tags" {
 }
 
 variable "ssh_public_key" {
-  description = "SSH public key for VM access"
+  description = "SSH public key for VM access (provide via terraform.tfvars or command line)"
   type        = string
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... # Replace with your SSH public key"
+  # No default - must be provided at deployment time
 }

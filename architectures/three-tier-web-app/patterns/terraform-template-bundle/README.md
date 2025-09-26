@@ -76,11 +76,11 @@ The template bundle automatically extracts configuration from your CALM model:
 ### Azure Resources
 
 - **Resource Group**: Container for all resources
-- **Virtual Network**: Network isolation with three subnets (web, app, data)
-- **Network Security Groups**: Tier-specific security rules
+- **Virtual Network**: Network isolation with single subnet for all tiers
+- **Network Security Groups**: Tier-specific security rules instead of subnet isolation
 - **Load Balancers**: 
-  - External LB with public IP for web tier
-  - Internal LB for app tier communication
+  - External Application Gateway with public IP for web tier
+  - Internal Load Balancer for app tier communication
 - **Virtual Machine Scale Sets**: Auto-scaling groups for web and app tiers
 - **Virtual Machine**: Dedicated database server
 - **Storage Account**: Blob storage for application assets
@@ -91,11 +91,11 @@ The template bundle automatically extracts configuration from your CALM model:
 ```
 Internet
     ↓
-[Public IP] → [External LB] → [Web Subnet] → [Web VMs]
-                                   ↓
-              [Internal LB] → [App Subnet] → [App VMs]  
-                                   ↓
-                           [Data Subnet] → [DB VM]
+[Public IP] → [External LB] → [Single Subnet: 10.0.1.0/24] 
+                                  ├── [Web VMs]
+                                  ├── [Internal LB] 
+                                  ├── [App VMs]
+                                  └── [DB VM]
 ```
 
 ## Customization
@@ -205,3 +205,44 @@ To extend this template bundle:
 ## License
 
 This template bundle is provided under the same license as the Common Cloud Controls project.
+
+```mermaid
+graph TB
+    User[("👤 User")]
+    
+    subgraph "Azure Resource Group"
+        subgraph "VNet: 10.0.0.0/16"
+            subgraph "Main Subnet: 10.0.1.0/24"
+                ELB["🔗 External Load Balancer<br/>Public IP"]
+                
+                subgraph "Web Tier (NSG: HTTP/HTTPS)"
+                    Web["🖥️ Web VMs<br/>Scale Set"]
+                end
+                
+                ILB["🔗 Internal Load Balancer<br/>10.0.1.x"]
+                
+                subgraph "App Tier (NSG: Internal)"
+                    App["⚙️ App VMs<br/>Scale Set"]
+                end
+                
+                subgraph "Database Tier (NSG: MongoDB)"
+                    DB["🗄️ Database VM<br/>10.0.1.10"]
+                end
+            end
+        end
+    end
+    
+    User --> ELB
+    ELB --> Web
+    Web --> ILB
+    ILB --> App
+    App --> DB
+    
+    classDef subnet fill:#e1f5fe
+    classDef nsg fill:#fff3e0
+    classDef compute fill:#e8f5e8
+    classDef lb fill:#fce4ec
+    
+    class ELB,ILB lb
+    class Web,App,DB compute
+```
