@@ -1,0 +1,289 @@
+{
+  "$schema": "https://calm.finos.org/common-cloud-controls/architectures/three-tier-web-app/patterns/three-tier-web-app.pattern.json",
+  "unique-id": "three-tier-web-app-pattern",
+  "name": "Three-Tier Web Application Pattern",
+  "description": "A CALM pattern for a generic three-tier web application, adaptable to multiple cloud providers.",
+  "nodes": [
+    {
+      "unique-id": "webtier",
+      "name": "Web Tier",
+      "description": "The logical web tier, containing web server VMs.",
+      "node-type": "compute"
+    },
+    {
+      "unique-id": "app-tier",
+      "name": "Application Tier",
+      "description": "The logical application tier, containing application server VMs.",
+      "node-type": "compute"
+    },
+    {
+      "unique-id": "db-tier",
+      "name": "Database Tier",
+      "description": "The logical database tier, containing the database instance.",
+      "node-type": "database"
+    },
+    {
+      "unique-id": "webtier-azure-vms",
+      "name": "Azure VMs",
+      "description": "The virtual machines in the web tier delivered by Azure.",
+      "node-type": "compute",
+      "ccc-service": "Virtual Machines (VMs)",
+      "csp-service": "Azure Virtual Machine Scale Sets"
+    },
+    {
+      "unique-id": "azure-app-server-vms",
+      "name": "Azure App Server VMs",
+      "description": "The virtual machines in the application tier delivered by Azure.",
+      "node-type": "compute",
+      "ccc-service": "Virtual Machines (VMs)",
+      "csp-service": "Azure Virtual Machine Scale Sets"
+    },
+    {
+      "unique-id": "azure-database",
+      "name": "Azure Database",
+      "description": "The database instance delivered by Azure.",
+      "node-type": "database",
+      "ccc-service": "Relational Database Management Systems",
+      "csp-service": "Azure Database for PostgreSQL / MySQL Flexible Server"
+    },
+    {
+      "unique-id": "azure-external-lb",
+      "name": "Azure External Load Balancer",
+      "description": "The external load balancer, distributing traffic to the web tier.",
+      "node-type": "load-balancer",
+      "ccc-service": "Load Balancing",
+      "csp-service": "Azure Application Gateway"
+    },
+    {
+      "unique-id": "azure-internal-lb",
+      "name": "Azure Internal Load Balancer",
+      "description": "The internal load balancer, distributing traffic from the web tier to the app tier.",
+      "node-type": "load-balancer",
+      "ccc-service": "Load Balancing",
+      "csp-service": "Azure Load Balancer"
+    },
+    {
+      "unique-id": "azure-vnet",
+      "name": "Azure Virtual Network (VNet)",
+      "description": "The virtual private cloud providing an isolated network environment.",
+      "node-type": "network",
+      "ccc-service": "Virtual Private Cloud (VPC)",
+      "csp-service": "Azure Virtual Network (VNet)"
+    },
+    {
+      "unique-id": "azure-subnet",
+      "name": "Azure Subnet",
+      "description": "The subnet for application components.",
+      "node-type": "network",
+      "ccc-service": "Subnet",
+      "csp-service": "Azure Virtual Network Subnets"
+    },
+    {
+      "unique-id": "application-user",
+      "name": "Application User",
+      "description": "A user of the application.",
+      "node-type": "actor"
+    },
+    {
+      "unique-id": "azure-provider",
+      "name": "Microsoft Azure",
+      "description": "The Azure provider.",
+      "node-type": "cloud-provider"
+    },
+    {
+      "unique-id": "azure-blob-storage",
+      "name": "Azure Blob Storage",
+      "description": "The object storage service from Azure.",
+      "node-type": "storage",
+      "ccc-service": "Object Storage",
+      "csp-service": "Azure Blob Storage"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "webtier-composed-of-azure-vms",
+      "relationship-type": {
+        "composed-of": {
+          "container": "webtier",
+          "nodes": [
+            "webtier-azure-vms"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "app-tier-composed-of-azure-vms",
+      "relationship-type": {
+        "composed-of": {
+          "container": "app-tier",
+          "nodes": [
+            "azure-app-server-vms"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "db-tier-composed-of-azure-db",
+      "relationship-type": {
+        "composed-of": {
+          "container": "db-tier",
+          "nodes": [
+            "azure-database"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "external-lb-to-webtier-azure",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "azure-external-lb"
+          },
+          "destination": {
+            "node": "webtier"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "webtier-to-internal-lb-azure",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "webtier"
+          },
+          "destination": {
+            "node": "azure-internal-lb"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "internal-lb-to-app-tier-azure",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "azure-internal-lb"
+          },
+          "destination": {
+            "node": "app-tier"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "app-tier-to-db-tier",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "app-tier"
+          },
+          "destination": {
+            "node": "db-tier"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "db-tier-to-object-store-azure",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "azure-database"
+          },
+          "destination": {
+            "node": "azure-blob-storage"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "components-in-subnet-azure",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "azure-subnet",
+          "nodes": [
+            "webtier",
+            "app-tier",
+            "db-tier",
+            "azure-internal-lb",
+            "azure-external-lb"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "subnet-in-vpc-azure",
+      "relationship-type": {
+        "composed-of": {
+          "container": "azure-vnet",
+          "nodes": [
+            "azure-subnet"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "user-connects-to-lb-azure",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "application-user"
+          },
+          "destination": {
+            "node": "azure-external-lb"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "csp-selection",
+      "description": "Select the Cloud Service Provider for the architecture.",
+      "relationship-type": {
+        "options": [
+          {
+            "description": "Microsoft Azure",
+            "nodes": [
+              "webtier-azure-vms",
+              "azure-app-server-vms",
+              "azure-database",
+              "azure-external-lb",
+              "azure-internal-lb",
+              "azure-vnet",
+              "azure-subnet",
+              "azure-provider",
+              "azure-blob-storage"
+            ],
+            "relationships": [
+              "webtier-composed-of-azure-vms",
+              "app-tier-composed-of-azure-vms",
+              "db-tier-composed-of-azure-db",
+              "external-lb-to-webtier-azure",
+              "user-connects-to-lb-azure",
+              "components-in-subnet-azure",
+              "webtier-to-internal-lb-azure",
+              "internal-lb-to-app-tier-azure",
+              "app-tier-to-db-tier",
+              "subnet-in-vpc-azure",
+              "vnet-in-azure-provider",
+              "db-tier-to-object-store-azure"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "unique-id": "vnet-in-azure-provider",
+      "relationship-type": {
+        "composed-of": {
+          "container": "azure-provider",
+          "nodes": [
+            "azure-vnet",
+            "azure-blob-storage"
+          ]
+        }
+      }
+    }
+  ]
+}

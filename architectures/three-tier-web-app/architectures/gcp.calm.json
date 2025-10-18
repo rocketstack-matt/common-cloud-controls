@@ -1,0 +1,289 @@
+{
+  "$schema": "https://calm.finos.org/common-cloud-controls/architectures/three-tier-web-app/patterns/three-tier-web-app.pattern.json",
+  "unique-id": "three-tier-web-app-pattern",
+  "name": "Three-Tier Web Application Pattern",
+  "description": "A CALM pattern for a generic three-tier web application, adaptable to multiple cloud providers.",
+  "nodes": [
+    {
+      "unique-id": "webtier",
+      "name": "Web Tier",
+      "description": "The logical web tier, containing web server VMs.",
+      "node-type": "compute"
+    },
+    {
+      "unique-id": "app-tier",
+      "name": "Application Tier",
+      "description": "The logical application tier, containing application server VMs.",
+      "node-type": "compute"
+    },
+    {
+      "unique-id": "db-tier",
+      "name": "Database Tier",
+      "description": "The logical database tier, containing the database instance.",
+      "node-type": "database"
+    },
+    {
+      "unique-id": "webtier-google-compute-engine-vms",
+      "name": "Google Cloud VMs",
+      "description": "The virtual machines in the web tier delivered by Google Cloud.",
+      "node-type": "compute",
+      "ccc-service": "Virtual Machines (VMs)",
+      "csp-service": "Compute Engine Managed Instance Group"
+    },
+    {
+      "unique-id": "google-app-server-vms",
+      "name": "Google Cloud App Server VMs",
+      "description": "The virtual machines in the application tier delivered by Google Cloud.",
+      "node-type": "compute",
+      "ccc-service": "Virtual Machines (VMs)",
+      "csp-service": "Compute Engine Managed Instance Group"
+    },
+    {
+      "unique-id": "google-cloud-sql",
+      "name": "Google Cloud SQL",
+      "description": "The database instance delivered by Google Cloud.",
+      "node-type": "database",
+      "ccc-service": "Relational Database Management Systems",
+      "csp-service": "Cloud SQL for PostgreSQL / MySQL"
+    },
+    {
+      "unique-id": "google-external-lb",
+      "name": "Google External Load Balancer",
+      "description": "The external load balancer, distributing traffic to the web tier.",
+      "node-type": "load-balancer",
+      "ccc-service": "Load Balancing",
+      "csp-service": "Global External HTTP(S) Load Balancer"
+    },
+    {
+      "unique-id": "google-internal-lb",
+      "name": "Google Internal Load Balancer",
+      "description": "The internal load balancer, distributing traffic from the web tier to the app tier.",
+      "node-type": "load-balancer",
+      "ccc-service": "Load Balancing",
+      "csp-service": "Internal HTTP(S) Load Balancer"
+    },
+    {
+      "unique-id": "google-vpc",
+      "name": "Google Virtual Private Cloud (VPC)",
+      "description": "The virtual private cloud providing an isolated network environment.",
+      "node-type": "network",
+      "ccc-service": "Virtual Private Cloud (VPC)",
+      "csp-service": "Virtual Private Cloud (VPC)"
+    },
+    {
+      "unique-id": "google-subnet",
+      "name": "Google Subnet",
+      "description": "The subnet for application components.",
+      "node-type": "network",
+      "ccc-service": "Subnet",
+      "csp-service": "VPC Subnets"
+    },
+    {
+      "unique-id": "application-user",
+      "name": "Application User",
+      "description": "A user of the application.",
+      "node-type": "actor"
+    },
+    {
+      "unique-id": "google-cloud-provider",
+      "name": "Google Cloud",
+      "description": "The Google Cloud provider.",
+      "node-type": "cloud-provider"
+    },
+    {
+      "unique-id": "google-cloud-storage",
+      "name": "Google Cloud Storage",
+      "description": "The object storage service from Google Cloud.",
+      "node-type": "storage",
+      "ccc-service": "Object Storage",
+      "csp-service": "Cloud Storage"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "webtier-composed-of-google-vms",
+      "relationship-type": {
+        "composed-of": {
+          "container": "webtier",
+          "nodes": [
+            "webtier-google-compute-engine-vms"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "app-tier-composed-of-google-vms",
+      "relationship-type": {
+        "composed-of": {
+          "container": "app-tier",
+          "nodes": [
+            "google-app-server-vms"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "db-tier-composed-of-google-sql",
+      "relationship-type": {
+        "composed-of": {
+          "container": "db-tier",
+          "nodes": [
+            "google-cloud-sql"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "external-lb-to-webtier-google",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "google-external-lb"
+          },
+          "destination": {
+            "node": "webtier"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "webtier-to-internal-lb-google",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "webtier"
+          },
+          "destination": {
+            "node": "google-internal-lb"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "internal-lb-to-app-tier-google",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "google-internal-lb"
+          },
+          "destination": {
+            "node": "app-tier"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "app-tier-to-db-tier",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "app-tier"
+          },
+          "destination": {
+            "node": "db-tier"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "db-tier-to-object-store-google",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "google-cloud-sql"
+          },
+          "destination": {
+            "node": "google-cloud-storage"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "components-in-subnet-google",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "google-subnet",
+          "nodes": [
+            "webtier",
+            "app-tier",
+            "db-tier",
+            "google-internal-lb",
+            "google-external-lb"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "subnet-in-vpc-google",
+      "relationship-type": {
+        "composed-of": {
+          "container": "google-vpc",
+          "nodes": [
+            "google-subnet"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "user-connects-to-lb-google",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "application-user"
+          },
+          "destination": {
+            "node": "google-external-lb"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "csp-selection",
+      "description": "Select the Cloud Service Provider for the architecture.",
+      "relationship-type": {
+        "options": [
+          {
+            "description": "Google Cloud",
+            "nodes": [
+              "webtier-google-compute-engine-vms",
+              "google-app-server-vms",
+              "google-cloud-sql",
+              "google-external-lb",
+              "google-internal-lb",
+              "google-vpc",
+              "google-subnet",
+              "google-cloud-provider",
+              "google-cloud-storage"
+            ],
+            "relationships": [
+              "webtier-composed-of-google-vms",
+              "app-tier-composed-of-google-vms",
+              "db-tier-composed-of-google-sql",
+              "external-lb-to-webtier-google",
+              "user-connects-to-lb-google",
+              "components-in-subnet-google",
+              "webtier-to-internal-lb-google",
+              "internal-lb-to-app-tier-google",
+              "app-tier-to-db-tier",
+              "subnet-in-vpc-google",
+              "vpc-in-google-provider",
+              "db-tier-to-object-store-google"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "unique-id": "vpc-in-google-provider",
+      "relationship-type": {
+        "composed-of": {
+          "container": "google-cloud-provider",
+          "nodes": [
+            "google-vpc",
+            "google-cloud-storage"
+          ]
+        }
+      }
+    }
+  ]
+}

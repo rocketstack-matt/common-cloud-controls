@@ -1,0 +1,6 @@
+{
+    "https://calm.finos.org/common-cloud-controls/architectures/three-tier-web-app/patterns/three-tier-web-app.pattern.json": "./patterns/three-tier-web-app.pattern.json",
+    "https://calm.finos.org/common-cloud-controls/three-tier-web-app/controls/encryption-at-rest.requirement.json": "./controls/encryption-at-rest.requirement.json",
+    "https://calm.finos.org/common-cloud-controls/three-tier-web-app/controls/aws-rds-encryption": "./controls/aws-rds-encryption.config.json",
+    "https://calm.finos.org/common-cloud-controls/three-tier-web-app/controls/aws-s3-encryption": "./controls/aws-s3-encryption.config.json"
+}

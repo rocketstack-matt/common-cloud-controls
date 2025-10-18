@@ -1,34 +1,39 @@
 {
     "$schema": "https://calm.finos.org/release/1.0-rc2/meta/calm.json",
-    "$id": "https://raw.githubusercontent.com/finos/architecture-as-code/main/common-cloud-controls/architectures/three-tier-web-app/patterns/three-tier-web-app.pattern.json",
-    "title": "Three-Tier Web Application Pattern",
-    "description": "A CALM pattern for a generic three-tier web application, adaptable to multiple cloud providers.",
     "type": "object",
     "properties": {
-        "metadata": {
-            "type": "array",
-            "prefixItems": [
-                {
-                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/metadata",
-                    "properties": {
-                        "project-name": { "const": "[[ PROJECT_NAME ]]" },
-                        "environment": { "const": "[[ ENVIRONMENT ]]" },
-                        "location": { "const": "[[ CLOUD_REGION ]]" },
-                        "resource-group-name": { "const": "[[ RESOURCE_GROUP_NAME ]]" }
-                    }
-                }
-            ]
-        },
+        "$schema": { "const": "https://calm.finos.org/common-cloud-controls/architectures/three-tier-web-app/patterns/three-tier-web-app.pattern.json" },
+        "unique-id": { "const": "three-tier-web-app-pattern" },
+        "name": { "const": "Three-Tier Web Application Pattern" },
+        "description": { "const": "A CALM pattern for a generic three-tier web application, adaptable to multiple cloud providers." },
         "nodes": {
             "type": "array",
             "prefixItems": [
                 {
                     "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                     "properties": {
-                        "unique-id": { "const": "application-user" },
-                        "name": { "const": "Application User" },
-                        "description": { "const": "A user of the application." },
-                        "node-type": { "const": "actor" }
+                        "unique-id": { "const": "webtier" },
+                        "name": { "const": "Web Tier" },
+                        "description": { "const": "The logical web tier, containing web server VMs." },
+                        "node-type": { "const": "compute" }
+                    }
+                },
+                {
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
+                    "properties": {
+                        "unique-id": { "const": "app-tier" },
+                        "name": { "const": "Application Tier" },
+                        "description": { "const": "The logical application tier, containing application server VMs." },
+                        "node-type": { "const": "compute" }
+                    }
+                },
+                {
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
+                    "properties": {
+                        "unique-id": { "const": "db-tier" },
+                        "name": { "const": "Database Tier" },
+                        "description": { "const": "The logical database tier, containing the database instance." },
+                        "node-type": { "const": "database" }
                     }
                 },
                 {
@@ -38,89 +43,21 @@
                             "properties": {
                                 "unique-id": { "const": "webtier-google-compute-engine-vms" },
                                 "name": { "const": "Google Cloud VMs" },
-                                "description": { "const": "Virtual machines running containerized web applications" },
+                                "description": { "const": "The virtual machines in the web tier delivered by Google Cloud." },
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
-                                "csp-service": { "const": "Compute Engine Managed Instance Group" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["e2-micro", "e2-small", "e2-medium", "e2-standard-2", "e2-standard-4", "n2-standard-2", "n2-standard-4", "c2-standard-4", "c2-standard-8"],
-                                    "default": "e2-micro"
-                                },
-                                "instance_count": { 
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 10,
-                                    "default": 2
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "web-container-image" },
-                                                "image": { 
-                                                    "type": "string",
-                                                    "description": "Docker image for the web frontend"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "web-service-port" },
-                                                "port": { "type": "integer" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "csp-service": { "const": "Compute Engine Managed Instance Group" }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "webtier-ec2-vms" },
-                                "name": { "const": "EC2 Instances" },
-                                "description": { "const": "EC2 instances running containerized web applications" },
+                                "name": { "const": "Amazon EC2 VMs" },
+                                "description": { "const": "The virtual machines in the web tier delivered by Amazon EC2." },
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
-                                "csp-service": { "const": "Elastic Compute Cloud (EC2)" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["t3.nano", "t3.micro", "t3.small", "t3.medium", "t3.large", "t3.xlarge", "m5.large", "m5.xlarge", "c5.large", "c5.xlarge"],
-                                    "default": "t3.micro"
-                                },
-                                "instance_count": { 
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 10,
-                                    "default": 2
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "web-container-image" },
-                                                "image": { 
-                                                    "type": "string",
-                                                    "description": "Docker image for the web frontend"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "web-service-port" },
-                                                "port": { "type": "integer" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "csp-service": { "const": "Amazon EC2 Auto Scaling with Launch Templates" }
                             }
                         },
                         {
@@ -128,44 +65,10 @@
                             "properties": {
                                 "unique-id": { "const": "webtier-azure-vms" },
                                 "name": { "const": "Azure VMs" },
-                                "description": { "const": "Virtual machines running containerized web applications" },
+                                "description": { "const": "The virtual machines in the web tier delivered by Azure." },
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
-                                "csp-service": { "const": "Azure Virtual Machine Scale Sets" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["Standard_B1s", "Standard_B1ms", "Standard_B2s", "Standard_B2ms", "Standard_B4ms", "Standard_D2s_v3", "Standard_D4s_v3", "Standard_F2s_v2", "Standard_F4s_v2"],
-                                    "default": "Standard_B2s"
-                                },
-                                "instance_count": { 
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 10,
-                                    "default": 2
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "web-container-image" },
-                                                "image": { 
-                                                    "type": "string",
-                                                    "description": "Docker image for the web frontend"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "web-service-port" },
-                                                "port": { "type": "integer" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "csp-service": { "const": "Azure Virtual Machine Scale Sets" }
                             }
                         }
                     ]
@@ -176,45 +79,11 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
                                 "unique-id": { "const": "google-app-server-vms" },
-                                "name": { "const": "Google Compute Engine App Server VMs" },
-                                "description": { "const": "Virtual machines running containerized applications" },
+                                "name": { "const": "Google Cloud App Server VMs" },
+                                "description": { "const": "The virtual machines in the application tier delivered by Google Cloud." },
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
-                                "csp-service": { "const": "Compute Engine Managed Instance Group" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["e2-small", "e2-medium", "e2-standard-2", "e2-standard-4", "e2-standard-8", "n2-standard-2", "n2-standard-4", "n2-standard-8", "c2-standard-4", "c2-standard-8"],
-                                    "default": "e2-small"
-                                },
-                                "instance_count": { 
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 10,
-                                    "default": 2
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "application-container-image" },
-                                                "image": { 
-                                                    "type": "string",
-                                                    "description": "Docker image for the application service"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "application-service-port" },
-                                                "port": { "type": "integer" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "csp-service": { "const": "Compute Engine Managed Instance Group" }
                             }
                         },
                         {
@@ -222,44 +91,10 @@
                             "properties": {
                                 "unique-id": { "const": "aws-app-server-vms" },
                                 "name": { "const": "Amazon EC2 App Server VMs" },
-                                "description": { "const": "Virtual machines running containerized applications" },
+                                "description": { "const": "The virtual machines in the application tier delivered by Amazon EC2." },
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
-                                "csp-service": { "const": "Amazon EC2 Auto Scaling with Launch Templates" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["t3.small", "t3.medium", "t3.large", "t3.xlarge", "t3.2xlarge", "m5.large", "m5.xlarge", "m5.2xlarge", "c5.large", "c5.xlarge", "c5.2xlarge"],
-                                    "default": "t3.small"
-                                },
-                                "instance_count": { 
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 10,
-                                    "default": 2
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "application-container-image" },
-                                                "image": { 
-                                                    "type": "string",
-                                                    "description": "Docker image for the application service"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "application-service-port" },
-                                                "port": { "type": "integer" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "csp-service": { "const": "Amazon EC2 Auto Scaling with Launch Templates" }
                             }
                         },
                         {
@@ -267,44 +102,10 @@
                             "properties": {
                                 "unique-id": { "const": "azure-app-server-vms" },
                                 "name": { "const": "Azure App Server VMs" },
-                                "description": { "const": "Virtual machines running containerized applications" },
+                                "description": { "const": "The virtual machines in the application tier delivered by Azure." },
                                 "node-type": { "const": "compute" },
                                 "ccc-service": { "const": "Virtual Machines (VMs)" },
-                                "csp-service": { "const": "Azure Virtual Machine Scale Sets" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["Standard_B1ms", "Standard_B2s", "Standard_B2ms", "Standard_B4ms", "Standard_B8ms", "Standard_D2s_v3", "Standard_D4s_v3", "Standard_D8s_v3", "Standard_F2s_v2", "Standard_F4s_v2", "Standard_F8s_v2"],
-                                    "default": "Standard_B2s"
-                                },
-                                "instance_count": { 
-                                    "type": "integer",
-                                    "minimum": 1,
-                                    "maximum": 10,
-                                    "default": 2
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "application-container-image" },
-                                                "image": { 
-                                                    "type": "string",
-                                                    "description": "Docker image for the application service"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "application-service-port" },
-                                                "port": { "type": "integer" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "csp-service": { "const": "Azure Virtual Machine Scale Sets" }
                             }
                         }
                     ]
@@ -314,118 +115,34 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
-                                "unique-id": { "const": "google-mongodb-vm" },
-                                "name": { "const": "Google Compute Engine MongoDB" },
-                                "description": { "const": "Compute Engine VM running MongoDB container" },
+                                "unique-id": { "const": "google-cloud-sql" },
+                                "name": { "const": "Google Cloud SQL" },
+                                "description": { "const": "The database instance delivered by Google Cloud." },
                                 "node-type": { "const": "database" },
-                                "ccc-service": { "const": "Document Database" },
-                                "csp-service": { "const": "Compute Engine with MongoDB" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["e2-medium", "e2-standard-2", "e2-standard-4", "e2-standard-8", "n2-standard-2", "n2-standard-4", "n2-standard-8", "n2-highmem-2", "n2-highmem-4"],
-                                    "default": "e2-medium"
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "mongodb-container-image" },
-                                                "image": { "const": "mongo:latest" }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "mongodb-port" },
-                                                "port": { "const": 27017 }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "ccc-service": { "const": "Relational Database Management Systems" },
+                                "csp-service": { "const": "Cloud SQL for PostgreSQL / MySQL" }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
-                                "unique-id": { "const": "aws-mongodb-ec2" },
-                                "name": { "const": "Amazon EC2 MongoDB" },
-                                "description": { "const": "EC2 instance running MongoDB container" },
+                                "unique-id": { "const": "aws-rds" },
+                                "name": { "const": "Amazon RDS" },
+                                "description": { "const": "The database instance delivered by Amazon RDS." },
                                 "node-type": { "const": "database" },
-                                "ccc-service": { "const": "Document Database" },
-                                "csp-service": { "const": "EC2 with MongoDB" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["t3.medium", "t3.large", "t3.xlarge", "t3.2xlarge", "m5.large", "m5.xlarge", "m5.2xlarge", "r5.large", "r5.xlarge", "r5.2xlarge"],
-                                    "default": "t3.medium"
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 2,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "mongodb-container-image" },
-                                                "image": { "const": "mongo:latest" }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "mongodb-port" },
-                                                "port": { "const": 27017 }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "ccc-service": { "const": "Relational Database Management Systems" },
+                                "csp-service": { "const": "Amazon RDS for PostgreSQL / MySQL" }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
                             "properties": {
-                                "unique-id": { "const": "azure-mongodb-vm" },
-                                "name": { "const": "Azure Virtual Machine MongoDB" },
-                                "description": { "const": "Azure VM running MongoDB container" },
+                                "unique-id": { "const": "azure-database" },
+                                "name": { "const": "Azure Database" },
+                                "description": { "const": "The database instance delivered by Azure." },
                                 "node-type": { "const": "database" },
-                                "ccc-service": { "const": "Document Database" },
-                                "csp-service": { "const": "Virtual Machine with MongoDB" },
-                                "vm_size": { 
-                                    "type": "string",
-                                    "enum": ["Standard_B2s", "Standard_B2ms", "Standard_B4ms", "Standard_B8ms", "Standard_D2s_v3", "Standard_D4s_v3", "Standard_D8s_v3", "Standard_E2s_v3", "Standard_E4s_v3", "Standard_E8s_v3"],
-                                    "default": "Standard_B2s"
-                                },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 3,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/container-image-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "mongodb-container-image" },
-                                                "image": { "const": "mongo:latest" }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/port-interface",
-                                            "properties": {
-                                                "unique-id": { "const": "mongodb-port" },
-                                                "port": { "const": 27017 }
-                                            }
-                                        },
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/interface-type",
-                                            "properties": {
-                                                "unique-id": { "const": "mongodb-network-interface" },
-                                                "host": { "const": "10.0.1.10" },
-                                                "port": { "const": 27017 },
-                                                "description": { "const": "Network interface for MongoDB VM with static IP" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "ccc-service": { "const": "Relational Database Management Systems" },
+                                "csp-service": { "const": "Azure Database for PostgreSQL / MySQL Flexible Server" }
                             }
                         }
                     ]
@@ -462,28 +179,7 @@
                                 "description": { "const": "The external load balancer, distributing traffic to the web tier." },
                                 "node-type": { "const": "load-balancer" },
                                 "ccc-service": { "const": "Load Balancing" },
-                                "csp-service": { "const": "Azure Application Gateway" },
-                                "interfaces": {
-                                    "type": "array",
-                                    "maxItems": 1,
-                                    "prefixItems": [
-                                        {
-                                            "$ref": "https://calm.finos.org/release/1.0-rc1/meta/interface.json#/defs/interface-type",
-                                            "properties": {
-                                                "unique-id": { "const": "external-lb-public-interface" },
-                                                "host": { 
-                                                    "type": "string",
-                                                    "description": "Public IP address of the load balancer"
-                                                },
-                                                "port": { 
-                                                    "type": "integer",
-                                                    "default": 80
-                                                },
-                                                "description": { "const": "Public-facing interface for external load balancer" }
-                                            }
-                                        }
-                                    ]
-                                }
+                                "csp-service": { "const": "Azure Application Gateway" }
                             }
                         }
                     ]
@@ -534,7 +230,7 @@
                                 "name": { "const": "Google Virtual Private Cloud (VPC)" },
                                 "description": { "const": "The virtual private cloud providing an isolated network environment." },
                                 "node-type": { "const": "network" },
-                                "ccc-service": { "const": "Virtual Network" },
+                                "ccc-service": { "const": "Virtual Private Cloud (VPC)" },
                                 "csp-service": { "const": "Virtual Private Cloud (VPC)" }
                             }
                         },
@@ -545,7 +241,7 @@
                                 "name": { "const": "Amazon Virtual Private Cloud (VPC)" },
                                 "description": { "const": "The virtual private cloud providing an isolated network environment." },
                                 "node-type": { "const": "network" },
-                                "ccc-service": { "const": "Virtual Network" },
+                                "ccc-service": { "const": "Virtual Private Cloud (VPC)" },
                                 "csp-service": { "const": "Amazon Virtual Private Cloud (VPC)" }
                             }
                         },
@@ -556,7 +252,7 @@
                                 "name": { "const": "Azure Virtual Network (VNet)" },
                                 "description": { "const": "The virtual private cloud providing an isolated network environment." },
                                 "node-type": { "const": "network" },
-                                "ccc-service": { "const": "Virtual Network" },
+                                "ccc-service": { "const": "Virtual Private Cloud (VPC)" },
                                 "csp-service": { "const": "Azure Virtual Network (VNet)" }
                             }
                         }
@@ -600,41 +296,13 @@
                     ]
                 },
                 {
-                    "oneOf": [
-                        {
-                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
-                            "properties": {
-                                "unique-id": { "const": "web-tier-nsg" },
-                                "name": { "const": "Web Tier Network Security Group" },
-                                "description": { "const": "Network security group for web tier allowing HTTP/HTTPS traffic." },
-                                "node-type": { "const": "network" },
-                                "ccc-service": { "const": "Network Security" },
-                                "csp-service": { "const": "Azure Network Security Groups" }
-                            }
-                        },
-                        {
-                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
-                            "properties": {
-                                "unique-id": { "const": "app-tier-nsg" },
-                                "name": { "const": "App Tier Network Security Group" },
-                                "description": { "const": "Network security group for app tier allowing internal traffic only." },
-                                "node-type": { "const": "network" },
-                                "ccc-service": { "const": "Network Security" },
-                                "csp-service": { "const": "Azure Network Security Groups" }
-                            }
-                        },
-                        {
-                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
-                            "properties": {
-                                "unique-id": { "const": "db-tier-nsg" },
-                                "name": { "const": "Database Tier Network Security Group" },
-                                "description": { "const": "Network security group for database tier allowing MongoDB traffic from app tier." },
-                                "node-type": { "const": "network" },
-                                "ccc-service": { "const": "Network Security" },
-                                "csp-service": { "const": "Azure Network Security Groups" }
-                            }
-                        }
-                    ]
+                    "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
+                    "properties": {
+                        "unique-id": { "const": "application-user" },
+                        "name": { "const": "Application User" },
+                        "description": { "const": "A user of the application." },
+                        "node-type": { "const": "actor" }
+                    }
                 },
                 {
                     "oneOf": [
@@ -690,6 +358,17 @@
                                 "ccc-service": { "const": "Object Storage" },
                                 "csp-service": { "const": "Amazon Simple Storage Service (Amazon S3)" }
                             }
+                        },
+                        {
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/node",
+                            "properties": {
+                                "unique-id": { "const": "azure-blob-storage" },
+                                "name": { "const": "Azure Blob Storage" },
+                                "description": { "const": "The object storage service from Azure." },
+                                "node-type": { "const": "storage" },
+                                "ccc-service": { "const": "Object Storage" },
+                                "csp-service": { "const": "Azure Blob Storage" }
+                            }
                         }
                     ]
                 }
@@ -703,43 +382,22 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "webtier-deployed-in-google-vms" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "google-subnet", 
-                                            "nodes": ["webtier-google-compute-engine-vms"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "webtier-composed-of-google-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-google-compute-engine-vms"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "webtier-deployed-in-amazon-vms" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "aws-subnet", 
-                                            "nodes": ["webtier-ec2-vms"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "webtier-composed-of-amazon-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-ec2-vms"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "webtier-deployed-in-azure-vms" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "azure-subnet", 
-                                            "nodes": ["webtier-azure-vms"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "webtier-composed-of-azure-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "webtier", "nodes": ["webtier-azure-vms"] } } }
                             }
                         }
                     ]
@@ -749,43 +407,22 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "app-tier-deployed-in-google-vms" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "google-subnet", 
-                                            "nodes": ["google-app-server-vms"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "app-tier-composed-of-google-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["google-app-server-vms"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "app-tier-deployed-in-aws-vms" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "aws-subnet", 
-                                            "nodes": ["aws-app-server-vms"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "app-tier-composed-of-aws-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["aws-app-server-vms"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "app-tier-deployed-in-azure-vms" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "azure-subnet", 
-                                            "nodes": ["azure-app-server-vms"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "app-tier-composed-of-azure-vms" },
+                                "relationship-type": { "const": { "composed-of": { "container": "app-tier", "nodes": ["azure-app-server-vms"] } } }
                             }
                         }
                     ]
@@ -795,43 +432,22 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "db-tier-deployed-in-google-mongodb" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "google-subnet", 
-                                            "nodes": ["google-mongodb-vm"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "db-tier-composed-of-google-sql" },
+                                "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["google-cloud-sql"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "db-tier-deployed-in-aws-mongodb" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "aws-subnet", 
-                                            "nodes": ["aws-mongodb-ec2"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "db-tier-composed-of-aws-rds" },
+                                "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["aws-rds"] } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "db-tier-deployed-in-azure-mongodb" },
-                                "relationship-type": { 
-                                    "const": { 
-                                        "deployed-in": { 
-                                            "container": "azure-subnet", 
-                                            "nodes": ["azure-mongodb-vm"] 
-                                        } 
-                                    } 
-                                }
+                                "unique-id": { "const": "db-tier-composed-of-azure-db" },
+                                "relationship-type": { "const": { "composed-of": { "container": "db-tier", "nodes": ["azure-database"] } } }
                             }
                         }
                     ]
@@ -842,21 +458,21 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "external-lb-to-webtier-google" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "google-external-lb" }, "destination": { "node": "webtier-google-compute-engine-vms" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "google-external-lb" }, "destination": { "node": "webtier" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "external-lb-to-webtier-aws" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-external-lb" }, "destination": { "node": "webtier-ec2-vms" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-external-lb" }, "destination": { "node": "webtier" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "external-lb-to-webtier-azure" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-external-lb" }, "destination": { "node": "webtier-azure-vms" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-external-lb" }, "destination": { "node": "webtier" } } } }
                             }
                         }
                     ]
@@ -867,21 +483,21 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-to-internal-lb-google" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier-google-compute-engine-vms" }, "destination": { "node": "google-internal-lb" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "google-internal-lb" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-to-internal-lb-aws" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier-ec2-vms" }, "destination": { "node": "aws-internal-lb" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "aws-internal-lb" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "webtier-to-internal-lb-azure" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier-azure-vms" }, "destination": { "node": "azure-internal-lb" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "webtier" }, "destination": { "node": "azure-internal-lb" } } } }
                             }
                         }
                     ]
@@ -892,21 +508,32 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "internal-lb-to-app-tier-google" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "google-internal-lb" }, "destination": { "node": "google-app-server-vms" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "google-internal-lb" }, "destination": { "node": "app-tier" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "internal-lb-to-app-tier-aws" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-internal-lb" }, "destination": { "node": "aws-app-server-vms" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-internal-lb" }, "destination": { "node": "app-tier" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "internal-lb-to-app-tier-azure" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-internal-lb" }, "destination": { "node": "azure-app-server-vms" } } } }
+                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-internal-lb" }, "destination": { "node": "app-tier" } } } }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "anyOf": [
+                            {
+                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
+                            "properties": {
+                                "unique-id": { "const": "app-tier-to-db-tier" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "app-tier" }, "destination": { "node": "db-tier" } } } }
                             }
                         }
                     ]
@@ -916,22 +543,22 @@
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "app-tier-to-db-tier" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "google-app-server-vms" }, "destination": { "node": "google-mongodb-vm" } } } }
+                                "unique-id": { "const": "db-tier-to-object-store-google" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "google-cloud-sql" }, "destination": { "node": "google-cloud-storage" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "app-tier-to-db-tier-aws" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-app-server-vms" }, "destination": { "node": "aws-mongodb-ec2" } } } }
+                                "unique-id": { "const": "db-tier-to-object-store-aws" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "aws-rds" }, "destination": { "node": "aws-s3" } } } }
                             }
                         },
                         {
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
-                                "unique-id": { "const": "app-tier-to-db-tier-azure" },
-                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-app-server-vms" }, "destination": { "node": "azure-mongodb-vm" } } } }
+                                "unique-id": { "const": "db-tier-to-object-store-azure" },
+                                "relationship-type": { "const": { "connects": { "source": { "node": "azure-database" }, "destination": { "node": "azure-blob-storage" } } } }
                             }
                         }
                     ]
@@ -946,7 +573,7 @@
                                     "const": {
                                         "deployed-in": {
                                             "container": "google-subnet",
-                                            "nodes": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-mongodb-vm", "google-internal-lb", "google-external-lb"]
+                                            "nodes": ["webtier", "app-tier", "db-tier", "google-internal-lb", "google-external-lb"]
                                         }
                                     }
                                 }
@@ -960,7 +587,7 @@
                                     "const": {
                                         "deployed-in": {
                                             "container": "aws-subnet",
-                                            "nodes": ["webtier-ec2-vms", "aws-app-server-vms", "aws-mongodb-ec2", "aws-internal-lb", "aws-external-lb"]
+                                            "nodes": ["webtier", "app-tier", "db-tier", "aws-internal-lb", "aws-external-lb"]
                                         }
                                     }
                                 }
@@ -974,7 +601,7 @@
                                     "const": {
                                         "deployed-in": {
                                             "container": "azure-subnet",
-                                            "nodes": ["webtier-azure-vms", "azure-app-server-vms", "azure-mongodb-vm", "azure-internal-lb", "azure-external-lb", "web-tier-nsg", "app-tier-nsg", "db-tier-nsg"]
+                                            "nodes": ["webtier", "app-tier", "db-tier", "azure-internal-lb", "azure-external-lb"]
                                         }
                                     }
                                 }
@@ -1053,10 +680,10 @@
                                                     "properties": {
                                                         "description": { "const": "Google Cloud" },
                                                         "nodes": {
-                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-mongodb-vm", "google-external-lb", "google-internal-lb", "google-vpc", "google-subnet", "google-cloud-provider", "google-cloud-storage"]
+                                                            "const": ["webtier-google-compute-engine-vms", "google-app-server-vms", "google-cloud-sql", "google-external-lb", "google-internal-lb", "google-vpc", "google-subnet", "google-cloud-provider", "google-cloud-storage"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-deployed-in-google-vms", "app-tier-deployed-in-google-vms", "db-tier-deployed-in-google-mongodb", "external-lb-to-webtier-google", "user-connects-to-lb-google", "components-in-subnet-google", "webtier-to-internal-lb-google", "internal-lb-to-app-tier-google", "subnet-in-vpc-google", "vpc-in-google-provider", "db-tier-to-object-store-google"]
+                                                            "const": ["webtier-composed-of-google-vms", "app-tier-composed-of-google-vms", "db-tier-composed-of-google-sql", "external-lb-to-webtier-google", "user-connects-to-lb-google", "components-in-subnet-google", "webtier-to-internal-lb-google", "internal-lb-to-app-tier-google", "app-tier-to-db-tier", "subnet-in-vpc-google", "vpc-in-google-provider", "db-tier-to-object-store-google"]
                                                         }
                                                     }
                                                 },
@@ -1066,10 +693,10 @@
                                                     "properties": {
                                                         "description": { "const": "Amazon Web Services (AWS)" },
                                                         "nodes": {
-                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-mongodb-ec2", "aws-external-lb", "aws-internal-lb", "aws-vpc", "aws-subnet", "aws-provider", "aws-s3"]
+                                                            "const": ["webtier-ec2-vms", "aws-app-server-vms", "aws-rds", "aws-external-lb", "aws-internal-lb", "aws-vpc", "aws-subnet", "aws-provider", "aws-s3"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-deployed-in-amazon-vms", "app-tier-deployed-in-aws-vms", "db-tier-deployed-in-aws-mongodb", "external-lb-to-webtier-aws", "user-connects-to-lb-aws", "components-in-subnet-aws", "webtier-to-internal-lb-aws", "internal-lb-to-app-tier-aws", "subnet-in-vpc-aws", "vpc-in-aws-provider", "db-tier-to-object-store-aws"]
+                                                            "const": ["webtier-composed-of-amazon-vms", "app-tier-composed-of-aws-vms", "db-tier-composed-of-aws-rds", "external-lb-to-webtier-aws", "user-connects-to-lb-aws", "components-in-subnet-aws", "webtier-to-internal-lb-aws", "internal-lb-to-app-tier-aws", "app-tier-to-db-tier", "subnet-in-vpc-aws", "vpc-in-aws-provider", "db-tier-to-object-store-aws"]
                                                         }
                                                     }
                                                 },
@@ -1078,10 +705,10 @@
                                                     "properties": {
                                                         "description": { "const": "Microsoft Azure" },
                                                         "nodes": {
-                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-mongodb-vm", "azure-external-lb", "azure-internal-lb", "azure-vnet", "azure-subnet", "azure-provider", "web-tier-nsg", "app-tier-nsg", "db-tier-nsg"]
+                                                            "const": ["webtier-azure-vms", "azure-app-server-vms", "azure-database", "azure-external-lb", "azure-internal-lb", "azure-vnet", "azure-subnet", "azure-provider", "azure-blob-storage"]
                                                         },
                                                         "relationships": {
-                                                            "const": ["webtier-deployed-in-azure-vms", "app-tier-deployed-in-azure-vms", "db-tier-deployed-in-azure-mongodb", "external-lb-to-webtier-azure", "user-connects-to-lb-azure", "components-in-subnet-azure", "webtier-to-internal-lb-azure", "internal-lb-to-app-tier-azure", "subnet-in-vpc-azure", "vnet-in-azure-provider", "app-tier-to-db-tier-azure", "web-tier-secured-by-nsg", "app-tier-secured-by-nsg", "db-tier-secured-by-nsg"]
+                                                            "const": ["webtier-composed-of-azure-vms", "app-tier-composed-of-azure-vms", "db-tier-composed-of-azure-db", "external-lb-to-webtier-azure", "user-connects-to-lb-azure", "components-in-subnet-azure", "webtier-to-internal-lb-azure", "internal-lb-to-app-tier-azure", "app-tier-to-db-tier", "subnet-in-vpc-azure", "vnet-in-azure-provider", "db-tier-to-object-store-azure"]
                                                         }
                                                     }
                                                 }
@@ -1113,28 +740,7 @@
                             "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
                             "properties": {
                                 "unique-id": { "const": "vnet-in-azure-provider" },
-                                "relationship-type": { "const": { "composed-of": { "container": "azure-provider", "nodes": ["azure-vnet"] } } }
-                            }
-                        },
-                        {
-                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
-                            "properties": {
-                                "unique-id": { "const": "web-tier-secured-by-nsg" },
-                                "relationship-type": { "const": { "deployed-in": { "container": "web-tier-nsg", "nodes": ["webtier-azure-vms"] } } }
-                            }
-                        },
-                        {
-                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
-                            "properties": {
-                                "unique-id": { "const": "app-tier-secured-by-nsg" },
-                                "relationship-type": { "const": { "deployed-in": { "container": "app-tier-nsg", "nodes": ["azure-app-server-vms"] } } }
-                            }
-                        },
-                        {
-                            "$ref": "https://calm.finos.org/release/1.0-rc2/meta/core.json#/defs/relationship",
-                            "properties": {
-                                "unique-id": { "const": "db-tier-secured-by-nsg" },
-                                "relationship-type": { "const": { "deployed-in": { "container": "db-tier-nsg", "nodes": ["azure-mongodb-vm"] } } }
+                                "relationship-type": { "const": { "composed-of": { "container": "azure-provider", "nodes": ["azure-vnet", "azure-blob-storage"] } } }
                             }
                         }
                     ]
@@ -1142,5 +748,5 @@
             ]
         }
     },
-    "required": ["metadata", "nodes", "relationships"]
+    "required": ["unique-id", "name", "description", "nodes", "relationships"]
 }

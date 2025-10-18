@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://calm.finos.org/common-cloud-controls/three-tier-web-app/controls/encryption-at-rest.requirement.json",
+  "title": "Data Encryption at Rest Control Requirement",
+  "description": "Control requirement for CCC.C02 - Ensure Data Encryption at Rest for All Stored Data",
+  "type": "object",
+  "properties": {
+    "control-id": {
+      "type": "string",
+      "description": "Unique identifier for this control instance"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the encryption at rest control"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of how encryption at rest is implemented"
+    },
+    "ccc-control-id": {
+      "type": "string",
+      "const": "CCC.C02",
+      "description": "Reference to Common Cloud Control CCC.C02"
+    },
+    "encryption-algorithm": {
+      "type": "string",
+      "enum": ["AES-256", "AES-128", "AES-256-GCM"],
+      "description": "Industry-standard encryption algorithm used"
+    },
+    "key-management": {
+      "type": "object",
+      "properties": {
+        "key-provider": {
+          "type": "string",
+          "enum": ["AWS KMS", "Customer-Managed", "Cloud-Provider-Managed"],
+          "description": "Key management service provider"
+        },
+        "key-rotation-enabled": {
+          "type": "boolean",
+          "description": "Whether automatic key rotation is enabled"
+        },
+        "key-rotation-period-days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of days between key rotations"
+        }
+      },
+      "required": ["key-provider", "key-rotation-enabled"]
+    },
+    "applies-to-data-types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["database", "object-storage", "file-system", "block-storage", "all"]
+      },
+      "description": "Types of data this encryption applies to"
+    },
+    "compliance-level": {
+      "type": "string",
+      "enum": ["tlp-clear", "tlp-green", "tlp-amber", "tlp-red"],
+      "description": "TLP classification level this control applies to"
+    }
+  },
+  "required": [
+    "control-id",
+    "name",
+    "description",
+    "ccc-control-id",
+    "encryption-algorithm",
+    "key-management",
+    "applies-to-data-types",
+    "compliance-level"
+  ]
+}

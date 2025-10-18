@@ -1,0 +1,15 @@
+{
+  "$id": "https://calm.finos.org/common-cloud-controls/three-tier-web-app/controls/ccc-c02-aws-rds-001",
+  "control-id": "ccc-c02-aws-rds-001",
+  "name": "Amazon RDS Encryption at Rest",
+  "description": "Amazon RDS database instances configured with encryption at rest using AWS KMS with automatic key rotation to protect data confidentiality and integrity per CCC.C02",
+  "ccc-control-id": "CCC.C02",
+  "encryption-algorithm": "AES-256",
+  "key-management": {
+    "key-provider": "AWS KMS",
+    "key-rotation-enabled": true,
+    "key-rotation-period-days": 365
+  },
+  "applies-to-data-types": ["database"],
+  "compliance-level": "tlp-amber"
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://calm.finos.org/finos/architecture-as-code/main/common-cloud-controls/architectures/three-tier-web-app/controls/encryption-at-rest.requirement.json",
+  "$id": "https://calm.finos.org/finos/architecture-as-code/main/common-cloud-controls/architectures/three-tier-web-app/controls/aws-s3-encryption.config.json",
+  "control-id": "ccc-c02-aws-s3-001",
+  "name": "Amazon S3 Encryption at Rest",
+  "description": "Amazon S3 buckets configured with server-side encryption using AWS KMS with automatic key rotation to protect object data confidentiality and integrity per CCC.C02",
+  "ccc-control-id": "CCC.C02",
+  "encryption-algorithm": "AES-256",
+  "key-management": {
+    "key-provider": "AWS KMS",
+    "key-rotation-enabled": true,
+    "key-rotation-period-days": 365
+  },
+  "applies-to-data-types": ["object-storage"],
+  "compliance-level": "tlp-amber"
+}
